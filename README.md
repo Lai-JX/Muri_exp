@@ -1,3 +1,5 @@
+# adapted from [Muri/cluster_exp](https://github.com/Rivendile/Muri/tree/main/cluster_exp)
+
 # Testbed experiments
 Note: 
 - Due to the execution scripts are highly related to intracompany platform, we only demonstrate the functionality and show the pseudocode of the related scripts (e.g., run.sh, prepare_env.sh). Please adjust the scripts to your platform if you would like to execute the testbed experiment.
@@ -72,4 +74,3 @@ Store these datsets in ```<repo>/cluster_exp/datasets/```
 - Each test takes about 1 day.
 
 Note: We list the detailed log (```<model>/cluster.csv``` and ```<model>/job.csv```) and evaluation results (```<model>/result.out```) in ```<repo>/cluster_exp/results```. You can use ```python3 draw.py``` to get the figures shown in our paper.
-# Muri_exp
