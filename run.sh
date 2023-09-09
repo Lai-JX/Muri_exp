@@ -3,6 +3,7 @@
 #we only demonstrate the functionality and show the pseudocode of the 
 #related scripts (e.g., run.sh, prepare_env.sh). Please adjust to your 
 #platform if you would like to execute the testbed experiment.
+echo -e "ljx:run.sh\n"
 
 THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
@@ -24,7 +25,7 @@ bash $THIS_DIR/prepare_env.sh $SCHEDULER_IP $WORKER_PORT $TRAINER_PORT $WORKER_I
 placement=('yarn')
 export schedules_all=$1
 shift
-jobs = ('cluster_trace')
+jobs=('cluster_trace')
 setups=("n8g8")
 packing_nums=("4")
 schedule_intervals=("360")

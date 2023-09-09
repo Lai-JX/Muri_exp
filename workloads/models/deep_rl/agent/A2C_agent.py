@@ -15,7 +15,9 @@ class A2CAgent(BaseAgent):
         BaseAgent.__init__(self, config)
         self.config = config
         self.task = config.task_fn()
-        self.network = config.network_fn()
+        print("before network")
+        self.network = config.network_fn()  # blocked here
+        print("after network")
         self.optimizer = config.optimizer_fn(self.network.parameters())
         self.total_steps = 0
         self.states = self.task.reset()

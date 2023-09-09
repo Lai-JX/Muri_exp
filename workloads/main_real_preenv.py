@@ -265,12 +265,11 @@ def train():
 
 
 if __name__ == '__main__':
+    print("ljx:main_real_preenv")
     args = parser.parse_args()
     args.cuda = not args.no_cuda and torch.cuda.is_available()
-
     hvd.init()
     torch.manual_seed(args.seed)
-
     if args.cuda:
         # Horovod: pin GPU to local rank.
         torch.cuda.set_device(hvd.local_rank())
@@ -287,11 +286,14 @@ if __name__ == '__main__':
     # deal with specific args
     sargs0, sargs1, sargs2, sargs3 = get_sargs()
     num_job = 0
+
     # time0 = time.time()
     if sargs0['iters']!=0:
         model0 = get_model(0, args, sargs0)
         model0.prepare(hvd)
         num_job += 1
+        
+    
     # time1 = time.time()
     if sargs1['iters']!=0:
         model1 = get_model(1, args, sargs1)
@@ -309,5 +311,4 @@ if __name__ == '__main__':
         num_job += 1
     # time4 = time.time()
     # print(time1-time0, time2-time1, time3-time2, time4-time3)
-
     train()

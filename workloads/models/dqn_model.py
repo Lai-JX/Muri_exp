@@ -59,7 +59,7 @@ class DQNModel:
         config.async_actor = False
         # if hvd.rank()==0:
         #     print(config)
-        self.model = DQNAgent(config)
+        self.model = DQNAgent(config)   # blocked here
         # print("build model!!!!!")
         self.optimizer = hvd.DistributedOptimizer(self.model.optimizer, named_parameters=self.model.network.named_parameters(prefix='model'+str(self.idx)))
         hvd.broadcast_parameters(self.model.network.state_dict(), root_rank=0)

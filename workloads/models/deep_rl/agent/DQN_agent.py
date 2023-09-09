@@ -50,16 +50,15 @@ class DQNAgent(BaseAgent):
         BaseAgent.__init__(self, config)
         self.config = config
         config.lock = mp.Lock()
-
         self.replay = config.replay_fn()
         self.actor = DQNActor(config)
-
-        self.network = config.network_fn()
+        print("before network")
+        self.network = config.network_fn()  # blocked here
+        print("after network")
         self.network.share_memory()
         self.target_network = config.network_fn()
         self.target_network.load_state_dict(self.network.state_dict())
         self.optimizer = config.optimizer_fn(self.network.parameters())
-
         self.actor.set_network(self.network)
         self.total_steps = 0
 

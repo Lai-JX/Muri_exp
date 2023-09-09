@@ -3,6 +3,7 @@
 #we only demonstrate the functionality and show the pseudocode of the 
 #related scripts (e.g., run.sh, prepare_env.sh). Please adjust to your 
 #platform if you would like to execute the testbed experiment.
+echo -e "ljx:run_preenv.sh\n"
 
 if [ $# -lt 33 ]; then
 	echo "usage: model_0, batch-size_0, num_workers0, prefetch_factor0, train_dir0, iter0, job_id0, job_counter0, model_1, batch-size_1, num_workers1, prefetch_factor1, train_dir1, iter1, job_id1, job_counter1, model_2, batch-size_2, num_workers2, prefetch_factor2, train_dir2, iter2, job_id2, job_counter2, model_3, batch-size_3, num_workers3, prefetch_factor3, train_dir3, iter3, job_id3, job_counter3, num_gpu, other_params"
@@ -183,5 +184,5 @@ echo "-------------------------------"
 echo $MODEL0 $BS0 $MODEL1 $BS1 $MODEL2 $BS2 $MODEL3 $BS3
 
 exec mpirun -n $NUM_GPU --npernode $GPU_PERNODE ${COMMON_CMD} \
-    python3 $THIS_DIR/main_real_preenv.py --model0 $MODEL0 --batch-size0 $BS0 --train-dir0 $TRAIN_DIR0 --num-workers0 ${NUM_WORKERS0} --prefetch-factor0 ${PREFETCH_FACTOR0} --iters0 $ITER0 --job-id0 $JOB_ID0 --model1 $MODEL1 --batch-size1 $BS1 --train-dir1 $TRAIN_DIR1 --num-workers1 ${NUM_WORKERS1} --prefetch-factor1 ${PREFETCH_FACTOR1} --iters1 $ITER1 --job-id1 $JOB_ID1 --model2 $MODEL2 --batch-size2 $BS2 --train-dir2 $TRAIN_DIR2 --num-workers2 ${NUM_WORKERS2} --prefetch-factor2 ${PREFETCH_FACTOR2} --iters2 $ITER2 --job-id2 $JOB_ID2 --model3 $MODEL3 --batch-size3 $BS3 --train-dir3 $TRAIN_DIR3 --num-workers3 ${NUM_WORKERS3} --prefetch-factor3 ${PREFETCH_FACTOR3} --iters3 $ITER3 --job-id3 $JOB_ID3 --this-dir $THIS_DIR $arg >$THIS_DIR/test.txt 
+    python3 $THIS_DIR/main_real_preenv.py --model0 $MODEL0 --batch-size0 $BS0 --train-dir0 $TRAIN_DIR0 --num-workers0 ${NUM_WORKERS0} --prefetch-factor0 ${PREFETCH_FACTOR0} --iters0 $ITER0 --job-id0 $JOB_ID0 --model1 $MODEL1 --batch-size1 $BS1 --train-dir1 $TRAIN_DIR1 --num-workers1 ${NUM_WORKERS1} --prefetch-factor1 ${PREFETCH_FACTOR1} --iters1 $ITER1 --job-id1 $JOB_ID1 --model2 $MODEL2 --batch-size2 $BS2 --train-dir2 $TRAIN_DIR2 --num-workers2 ${NUM_WORKERS2} --prefetch-factor2 ${PREFETCH_FACTOR2} --iters2 $ITER2 --job-id2 $JOB_ID2 --model3 $MODEL3 --batch-size3 $BS3 --train-dir3 $TRAIN_DIR3 --num-workers3 ${NUM_WORKERS3} --prefetch-factor3 ${PREFETCH_FACTOR3} --iters3 $ITER3 --job-id3 $JOB_ID3 --this-dir $THIS_DIR $arg #>$THIS_DIR/test.txt 
 
