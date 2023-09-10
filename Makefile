@@ -6,3 +6,6 @@ rpc:
 
 clean:
 	rm -rf runtime/rpc_stubs/*_pb2.py runtime/rpc_stubs/*_pb2_grpc.py
+
+push:
+	git add .; git commit -m update; git push -u origin master;

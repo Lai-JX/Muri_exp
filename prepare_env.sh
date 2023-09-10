@@ -25,7 +25,7 @@ shift
 mkdir $THIS_DIR/hostfiles
 hostfile=$THIS_DIR/hostfiles/hostfile-[0-0-0-0]-[0-0-0-0]
 rm -f $hostfile
-echo "worker-${WORKER_ID}" >>${hostfile}    # 将"worker-${WORKER_ID}"写入文件hostfile
+echo "worker-${WORKER_ID}" >>${hostfile}    # 将"worker-${WORKER_ID}"写入文件hostfile   我们需要改为gpu1
 
 # ljx
 # CUDA_VISIBLE_DEVICES=0 bash $THIS_DIR/run_preenv.sh gpt2 4 0 2 -1 10 0 0 gpt2 4 0 2 -1 0 0 0 gpt2 4 0 2 -1 0 0 0 gpt2 4 0 2 -1 0 0 0 1 --scheduler-ip $SCHEDULER_IP --trainer-port $TRAINER_PORT

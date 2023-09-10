@@ -122,8 +122,9 @@ def parse_job_file(trace_file):
         #add job into JOBS,  JOBS = _TFJobs()
         if row['model_name'] != 'bert' and row['model_name'] != 'gpt2':     # ljx
             JOBS.add_job(row)
+            job_idx += 1
         # JOBS.read_job_info(job_idx, 'num_gpu')
-        job_idx += 1
+        # job_idx += 1    
 
     assert job_idx == len(JOBS.job_list) 
     assert JOBS.num_job == len(JOBS.job_list) 

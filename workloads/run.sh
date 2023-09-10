@@ -171,8 +171,8 @@ echo $hostfile
 # set common command for mpirun
 COMMON_CMD=""
 
-if [ $NUM_GPU -ge 8 ]; then
-    GPU_PERNODE=8
+if [ $NUM_GPU -ge 4 ]; then         # ljx 改为4，一台机器只有4个gpu
+    GPU_PERNODE=4
 else
     GPU_PERNODE=$NUM_GPU
 fi
