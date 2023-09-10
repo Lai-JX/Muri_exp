@@ -33,6 +33,11 @@ def get_host_ip():
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(('8.8.8.8', 80))
         ip = s.getsockname()[0]
+        # ljx: 由于我们使用的环境的ip是设置好的，详细看 /etc/hosts, 所以需要结合实际对应的ip改动一下
+        ip = ip.split('.')
+        ip[1],ip[2] = "0", "0"
+        ip[3] = str(int(ip[3]) + 9)
+        ip = ".".join(ip)
     finally:
         s.close()
     return ip
