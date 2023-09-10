@@ -28,7 +28,7 @@ shift
 jobs=('cluster_trace')
 setups=("n4g4")
 packing_nums=("4")
-schedule_intervals=("360")
+schedule_intervals=("360")          # 6分钟（和论文中一致）
 fast_forwards=("60")
 
 IFS=','
@@ -58,7 +58,8 @@ for setup in ${setups[@]};do                                                    
                                 python $THIS_DIR/run.py --cluster_spec=$THIS_DIR/${cluster_spec} --print --scheme=${p} --trace_file=$THIS_DIR/${job_file} --schedule=${s} --log_path=$THIS_DIR/${log_name} --packing_num ${packing_num} --schedule_interval ${schedule_interval} --fast_forwarding ${fast_forward} >$THIS_DIR/${log_name}/scheduler.out &
                                 sleep 10s
                             else
-                                sleep 6m
+                                # sleep 6m    # ljx
+                                sleep 1m
                             fi
 
                             # start worker for all nodes. 这里only one node?! → 根据WORKER_ID来指定

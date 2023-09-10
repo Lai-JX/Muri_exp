@@ -574,6 +574,7 @@ def dlas_sim_jobs(scheduler, gputime=False, solve_starvation=0, place=False):
             while scheduler.get_time()-last_check_time<FLAGS.schedule_interval and scheduler.has_running_trainers(running_jobs):                    # 还没到调度时间，且还有job在运行
                 # print("waiting for trainers: ", scheduler.get_time(), running_jobs, scheduler.has_running_trainers(running_jobs), scheduler._trainers.keys())
                 time.sleep(5)
+            print("ljx:assert len(scheduler._trainers.keys())==running_jobs",len(scheduler._trainers.keys()), running_jobs)
             assert len(scheduler._trainers.keys())==running_jobs
             if running_jobs>0:
                 time.sleep(2)
