@@ -11,7 +11,7 @@ import log
 class Controller(object):
     def __init__(self, port: int, num_workers: int) -> None:
         super().__init__()
-
+        print("ljx: Controller init!\n")
         self._logger = utils.make_logger(__name__)
 
         self._num_workers = num_workers
@@ -22,6 +22,7 @@ class Controller(object):
         self._server_for_worker = self.make_server_for_worker(port)
         
         self.wait_for_workers()
+        print("ljx: Controller wait finish!\n")
         self._jump_time = 0
         self._start_time = time.time()
 

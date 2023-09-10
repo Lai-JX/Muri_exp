@@ -43,13 +43,13 @@ for setup in ${setups[@]};do                                                    
             for schedule_interval in ${schedule_intervals[@]};do                                        # 调度的时间间隔
                 for fast_forward in ${fast_forwards[@]};do                                              # fast_forward
                     trace_name="${setup}j${job}p${packing_num}si${schedule_interval}ff${fast_forward}"
-                    log_folder="results/${trace_name}"
+                    log_folder="results/${trace_name}"                                                      # results/n4g4jcluster_tracep4si360ff60
                     mkdir $THIS_DIR/${log_folder}
                     for p in ${placement[@]};do                                                         # placement 策略
                         for s in ${schedule[@]};do
-                            log_name="${log_folder}/${s}-${p}-${packing_num}"
+                            log_name="${log_folder}/${s}-${p}-${packing_num}"                               # run.py的log path: results/n4g4jcluster_tracep4si360ff60/dlas-gpu-yarn-4
                             mkdir $THIS_DIR/$log_name
-                            job_log="$THIS_DIR/job_logs/${trace_name}/${s}-${p}-${packing_num}"
+                            job_log="$THIS_DIR/job_logs/${trace_name}/${s}-${p}-${packing_num}"             # worker.py的log path: job_logs/clusster_trace/dlas-gpu-yarn-4
                             rm -rf $job_log
                             echo "running..." $setup $job $s
                             if [ $WORKER_ID -eq 1 ]; then
@@ -59,7 +59,7 @@ for setup in ${setups[@]};do                                                    
                                 sleep 10s
                             else
                                 # sleep 6m    # ljx
-                                sleep 1m
+                                sleep 10s
                             fi
 
                             # start worker for all nodes. 这里only one node?! → 根据WORKER_ID来指定
