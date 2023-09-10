@@ -10,5 +10,4 @@ clean:
 push:
 	git add .; git commit -m update; git push -u origin master;
 run:
-	git pull;
-	./run.sh 10.0.0.11 9001 9013 1 dlas-gpu
+	git pull; ./run.sh 10.0.0.11 9001 9013 1 dlas-gpu
