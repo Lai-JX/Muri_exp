@@ -26,7 +26,7 @@ placement=('yarn')
 export schedules_all=$1
 shift
 jobs=('cluster_trace')
-setups=("n8g8")
+setups=("n4g4")
 packing_nums=("4")
 schedule_intervals=("360")
 fast_forwards=("60")
