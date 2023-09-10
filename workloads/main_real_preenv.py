@@ -267,7 +267,7 @@ def train():
 if __name__ == '__main__':
     print("ljx:main_real_preenv")
     args = parser.parse_args()
-    print(args)
+    # print(args)
     args.cuda = not args.no_cuda and torch.cuda.is_available()
     hvd.init()
     torch.manual_seed(args.seed)
