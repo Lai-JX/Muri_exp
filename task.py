@@ -16,7 +16,7 @@ class Task(object):
         self._batch_size = job_info.batch_size      # list
         self._iterations = job_info.iterations      # list
         self._gpus = job_info.gpus                  # 第一个node的gpu_list
-        self._scheduler_ip = scheduler_ip
+        self._scheduler_ip = scheduler_ip           # 即master_ip
         self._num_gpu = job_info.num_gpu            # 第一个job的gpu
         self._this_dir = this_dir
         self._job_counter = job_info.job_counter    # list
