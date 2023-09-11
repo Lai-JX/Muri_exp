@@ -767,6 +767,7 @@ def dlas_sim_jobs(scheduler, gputime=False, solve_starvation=0, place=False):
                         if rjob['status'] == 'PENDING':
                             run_jobs.append(rjob)
                         jobinfo = JOBS.to_jobinfo(rjob)
+                        print("ljx:execute (called by schedule._controller)! ")
                         scheduler._controller.execute(jobinfo)
                     else:                               # 没有资源不够的job，先抢占
                         if rjob['status'] == 'RUNNING':
