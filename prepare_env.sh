@@ -32,6 +32,6 @@ echo "gpu${WORKER_ID}" >>${hostfile}
 # CUDA_VISIBLE_DEVICES=0 bash $THIS_DIR/run_preenv.sh gpt2 4 0 2 -1 10 0 0 gpt2 4 0 2 -1 0 0 0 gpt2 4 0 2 -1 0 0 0 gpt2 4 0 2 -1 0 0 0 1 --scheduler-ip $SCHEDULER_IP --trainer-port $TRAINER_PORT
 # CUDA_VISIBLE_DEVICES=0 bash $THIS_DIR/run_preenv.sh bert 4 0 2 -1 10 0 0 gpt2 4 0 2 -1 0 0 0 gpt2 4 0 2 -1 0 0 0 gpt2 4 0 2 -1 0 0 0 1 --scheduler-ip $SCHEDULER_IP --trainer-port $TRAINER_PORT
 
-CUDA_VISIBLE_DEVICES=0 bash $THIS_DIR/run_preenv.sh dqn 4 0 2 -1 10 0 0 dqn 4 0 2 -1 0 0 0 dqn 4 0 2 -1 0 0 0 dqn 4 0 2 -1 0 0 0 1 --scheduler-ip $SCHEDULER_IP --trainer-port $TRAINER_PORT
+CUDA_VISIBLE_DEVICES=0 bash $THIS_DIR/run_preenv.sh dqn 4 0 2 -1 10 0 0 dqn 4 0 2 -1 0 0 0 dqn 4 0 2 -1 0 0 0 dqn 4 0 2 -1 0 0 0 8 --scheduler-ip $SCHEDULER_IP --trainer-port $TRAINER_PORT
 # CUDA_VISIBLE_DEVICES=0 bash $THIS_DIR/run_preenv.sh a2c 4 0 2 -1 10 0 0 a2c 4 0 2 -1 0 0 0 a2c 4 0 2 -1 0 0 0 a2c 4 0 2 -1 0 0 0 1 --scheduler-ip $SCHEDULER_IP --trainer-port $TRAINER_PORT
 
