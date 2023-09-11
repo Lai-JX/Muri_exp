@@ -49,8 +49,11 @@ def print_fn(log):
             sys.stdout.flush()
 
 
-def print_ljx(log):
-    print("ljx:",log)
+def print_ljx(*objects, sep=' ', end='\n', file=sys.stdout, flush=False):
+    # print("current time:" + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+    print("output setted by LJX:", end="\n\t")
+    print(*objects, sep=sep, end=end, file=file, flush=flush)
+
 
 
 def mkdir(folder_path):
@@ -98,3 +101,4 @@ def find_free_port():
 
 if __name__ == '__main__':
     print(get_host_ip())
+    print(print_ljx("hhh"))
