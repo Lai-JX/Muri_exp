@@ -49,7 +49,7 @@ for setup in ${setups[@]};do                                                    
                         for s in ${schedule[@]};do
                             log_name="${log_folder}/${s}-${p}-${packing_num}"                               # run.py的log path: results/n4g4jcluster_tracep4si360ff60/dlas-gpu-yarn-4
                             mkdir $THIS_DIR/$log_name
-                            job_log="$THIS_DIR/job_logs/${trace_name}/${s}-${p}-${packing_num}"             # worker.py的log path: job_logs/clusster_trace/dlas-gpu-yarn-4
+                            job_log="$THIS_DIR/job_logs/${trace_name}/${s}-${p}-${packing_num}"             # worker.py的log path: job_logs/n4g4jcluster_tracep4si360ff60/dlas-gpu-yarn-4
                             rm -rf $job_log
                             echo "running..." $setup $job $s
                             if [ $WORKER_ID -eq 1 ]; then

@@ -62,7 +62,7 @@ class Task(object):
         # print(self._iterations)
         with open(hostfile_dir+f'/hostfile-[{job_id_str}]-[{job_counter_str}]', 'w') as f:
             f.writelines(hostfile_list)
-
+        utils.print_ljx("task.run:hostfile_list:", hostfile_list)
         environ_dict = dict(os.environ)
         environ_dict['CUDA_VISIBLE_DEVICES'] = self._gpus
         with open(self.log_path, 'w+') as f:
