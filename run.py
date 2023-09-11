@@ -792,7 +792,7 @@ def dlas_sim_jobs(scheduler, gputime=False, solve_starvation=0, place=False):
                         queue.remove(job)
                     queue.extend(pending_job)       # 将pending job放最后
 
-                time.sleep(20)
+                time.sleep(60)                      # 原本为20，调高一点，让trainer register
             last_check_time = tmp_time
             est_check_time = last_check_time + FLAGS.schedule_interval
             # LOG.checkpoint(tmp_time, scheduler, done_flag or new_flag or demote_flag, secs)
