@@ -55,7 +55,8 @@ for setup in ${setups[@]};do                                                    
                             if [ $WORKER_ID -eq 1 ]; then
                                 # start scheduler for the main node
                                 echo -e '\nstart scheduler for the main node\n'
-                                python $THIS_DIR/run.py --cluster_spec=$THIS_DIR/${cluster_spec} --print --scheme=${p} --trace_file=$THIS_DIR/${job_file} --schedule=${s} --log_path=$THIS_DIR/${log_name} --packing_num ${packing_num} --schedule_interval ${schedule_interval} --fast_forwarding ${fast_forward} & # >$THIS_DIR/${log_name}/scheduler.out &   # ljx
+                                # python $THIS_DIR/run.py --cluster_spec=$THIS_DIR/${cluster_spec} --print --scheme=${p} --trace_file=$THIS_DIR/${job_file} --schedule=${s} --log_path=$THIS_DIR/${log_name} --packing_num ${packing_num} --schedule_interval ${schedule_interval} --fast_forwarding ${fast_forward} & # >$THIS_DIR/${log_name}/scheduler.out &   # ljx
+                                python $THIS_DIR/run.py --cluster_spec=$THIS_DIR/${cluster_spec} --print --scheme=${p} --trace_file=$THIS_DIR/${job_file} --schedule=${s} --log_path=$THIS_DIR/${log_name} --packing_num ${packing_num} --schedule_interval ${schedule_interval} --fast_forwarding ${fast_forward}  >$THIS_DIR/${log_name}/scheduler.out &   # ljx
                                 sleep 10s
                             else
                                 # sleep 6m    # ljx
