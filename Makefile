@@ -9,9 +9,11 @@ clean:
 
 push:
 	git add .; git commit -m update; git push -u gitee master;
+pull:
+	git pull gitee master;
 push_all:
 	git add .; git commit -m update; git push -u origin master; git push -u gitee master;
 run:
-	./run.sh 10.0.0.11 9001 9013 1 dlas-gpu
+	git pull gitee master;./run.sh 10.0.0.11 9001 9013 1 dlas-gpu
 reset:
 	git fetch; git reset --hard HEAD; git merge origin/master
