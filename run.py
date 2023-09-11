@@ -17,7 +17,7 @@ import flags
 import jobs
 import cluster
 import log
-# import lp     # 暂时注释，后面没用到，不知道作者的用途是什么
+# import lp     # 暂时注释，'balance' 对应的放置策略
 from matching import Blossom_Same, _Packing
 from scheduler import Scheduler
 # import hosts
