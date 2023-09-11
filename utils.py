@@ -49,6 +49,10 @@ def print_fn(log):
             sys.stdout.flush()
 
 
+def print_ljx(log):
+    print("ljx:",log)
+
+
 def mkdir(folder_path):
     cmd = 'mkdir -p ' + folder_path
     ret = subprocess.check_call(cmd, shell=True)
