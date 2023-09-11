@@ -232,6 +232,8 @@ class _Switch(object):
         if need_gpu <= gpu_p_node
             then get one node with enough gpus
         '''
+        
+        utils.print_ljx("job:\n",job)
         need_gpu = job['num_gpu']
         ret = False
         if need_gpu > self.num_gpu_p_node:
