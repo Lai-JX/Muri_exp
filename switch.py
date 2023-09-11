@@ -62,6 +62,8 @@ class _Switch(object):
 
         ps_mem = JOBS.ps_mem + need_gpu * JOBS.p_w_mem
         ps_w_mem = ps_mem + JOBS.worker_mem             # ljx理解：ps的mem + worker的mem + 之间交流的mem(类似于缓冲区？)
+        
+        print("try_cross_node_alloc: ", need_gpu, num_full_nodes, self.num_gpu_p_node, idle_node_cpu, last_node_gpu, last_node_cpu,  ps_w_mem)
 
         full_node_list = list()
         for node in self.node_list:
