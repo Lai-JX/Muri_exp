@@ -8,7 +8,9 @@ clean:
 	rm -rf runtime/rpc_stubs/*_pb2.py runtime/rpc_stubs/*_pb2_grpc.py
 
 push:
-	git add .; git commit -m update; git push -u origin master;
+	git add .; git commit -m update; git push -u gitee master;
+push_all:
+	git add .; git commit -m update; git push -u origin master; git push -u gitee master;
 run:
 	./run.sh 10.0.0.11 9001 9013 1 dlas-gpu
 reset:
