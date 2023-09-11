@@ -574,7 +574,7 @@ def dlas_sim_jobs(scheduler, gputime=False, solve_starvation=0, place=False):
             while scheduler.get_time()-last_check_time<FLAGS.schedule_interval and scheduler.has_running_trainers(running_jobs):                    # 还没到调度时间，且还有job在运行
                 # print("waiting for trainers: ", scheduler.get_time(), running_jobs, scheduler.has_running_trainers(running_jobs), scheduler._trainers.keys())
                 time.sleep(5)
-            # print("ljx:assert len(scheduler._trainers.keys())==running_jobs",len(scheduler._trainers.keys()), running_jobs)
+            utils.print_ljx("assert len(scheduler._trainers.keys())==running_jobs",len(scheduler._trainers.keys()), running_jobs)
             assert len(scheduler._trainers.keys())==running_jobs
             if running_jobs>0:
                 time.sleep(2)
@@ -1733,15 +1733,15 @@ def main():
     JOBS.prepare_job_start_events()                                     # 遍历所有job，将所有time添加到JOBS.job_events(sort events based on their submit time), 并将job加到对应的start_jobs列表中 every job has been in EVENT status
 
     # sim_job_events()
-    if FLAGS.schedule == 'shortest':
+    if FLAGS.schedule == 'shortest':                                                        # SRTF
         shortest_first_sim_jobs(scheduler)
-    elif FLAGS.schedule == 'shortest-gpu':
+    elif FLAGS.schedule == 'shortest-gpu':                                                  # SRSF
         shortest_first_sim_jobs(scheduler, True)
-    elif FLAGS.schedule == 'dlas-gpu':      # Tiresias
+    elif FLAGS.schedule == 'dlas-gpu':                                                      # Tiresias
         dlas_sim_jobs(scheduler, True)
-    elif FLAGS.schedule == 'multi-resource-blossom-same-gpu':
+    elif FLAGS.schedule == 'multi-resource-blossom-same-gpu':                               # Muri-S
         multi_resource_blossom_same_sim_jobs(scheduler, True)
-    elif FLAGS.schedule == 'multi-resource-blossom-same-gpu-unaware':
+    elif FLAGS.schedule == 'multi-resource-blossom-same-gpu-unaware':                       # Muri-L
         multi_resource_blossom_same_sim_jobs(scheduler, True, know_duration=False)
     elif FLAGS.schedule == 'multi-resource-blossom-same-gpu-unaware-worstordering':
         multi_resource_blossom_same_sim_jobs(scheduler, True, know_duration=False, ordering=2)
