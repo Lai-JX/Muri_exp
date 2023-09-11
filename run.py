@@ -781,7 +781,7 @@ def dlas_sim_jobs(scheduler, gputime=False, solve_starvation=0, place=False):
                 for job in run_jobs:
                     job['status'] = 'RUNNING'
                     job['resume'] = int(job['resume'] + 1)
-                    scheduler._logger.info(f'scheduler, {job["job_idx"]}, run')
+                    scheduler._logger.info(f'scheduler, {job["job_idx"]}, run')             # print run
 
                 for queue in JOBS.queues:
                     pending_job = list()
@@ -792,7 +792,7 @@ def dlas_sim_jobs(scheduler, gputime=False, solve_starvation=0, place=False):
                         queue.remove(job)
                     queue.extend(pending_job)       # 将pending job放最后
 
-                time.sleep(30)
+                time.sleep(20)
             last_check_time = tmp_time
             est_check_time = last_check_time + FLAGS.schedule_interval
             # LOG.checkpoint(tmp_time, scheduler, done_flag or new_flag or demote_flag, secs)
