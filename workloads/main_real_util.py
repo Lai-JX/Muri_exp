@@ -269,19 +269,25 @@ def train():
 
 
 if __name__ == '__main__':
+    utils.print_ljx("main_real_util")
+    
     args = parser.parse_args()
     args.cuda = not args.no_cuda and torch.cuda.is_available()
-
+    utils.print_ljx("main_real_util    1")
     hvd.init()
+    utils.print_ljx("main_real_util    2")
     torch.manual_seed(args.seed)
 
     if args.cuda:
+        utils.print_ljx("main_real_util    3")
         # Horovod: pin GPU to local rank. 一个gpu一个进程
         torch.cuda.set_device(hvd.local_rank())
         torch.cuda.manual_seed(args.seed)
+    utils.print_ljx("main_real_util    4")
     if hvd.rank()==0:                       # 第一个进程
+        utils.print_ljx("main_real_util    5")
         trainer = Trainer(args.scheduler_ip, args.scheduler_port, utils.get_host_ip(), args.trainer_port, [args.job_id0, args.job_id1, args.job_id2, args.job_id3])
-
+    utils.print_ljx("main_real_util    6")
     cudnn.benchmark = True  # 设置 torch.backends.cudnn.benchmark=True 将会让程序在开始时花费一点额外时间，为整个网络的每个卷积层搜索最适合它的卷积实现算法，进而实现网络的加速
 
     # Horovod: print logs on the first worker.
@@ -320,5 +326,6 @@ if __name__ == '__main__':
     #     exit(1)
     # elif args.job_id0==2:
     #     time.sleep(100)
-
+    utils.print_ljx("main_real_util    7")
     train()
+    utils.print_ljx("main_real_util    8")

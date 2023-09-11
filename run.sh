@@ -64,7 +64,7 @@ for setup in ${setups[@]};do                                                    
 
                             # start worker for all nodes. 这里only one node?! → 根据WORKER_ID来指定
                             echo -e '\nstart worker\n'
-                            python $THIS_DIR/worker.py --master_ip $SCHEDULER_IP --worker_port $WORKER_PORT --trace_name ${job_log} --this-dir ${THIS_DIR} $arg >$THIS_DIR/${log_name}/worker${WORKER_ID}.out &     # ljx
+                            python $THIS_DIR/worker.py --master_ip $SCHEDULER_IP --worker_port $WORKER_PORT --trace_name ${job_log} --this-dir ${THIS_DIR} $arg >$THIS_DIR/${log_name}/worker${WORKER_ID}.out &     # ljx 由于家目录共享，所以加个WORKER_ID区分一下不同worker.out
 
                             wait
 
