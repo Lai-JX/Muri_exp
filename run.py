@@ -721,7 +721,7 @@ def dlas_sim_jobs(scheduler, gputime=False, solve_starvation=0, place=False):
             # 3. demote_flag: 优先队列变化（饥饿 or 时间乘gpu）
             if done_flag or new_flag or demote_flag:
                 scheduler.clear_src_utils()
-                utils.print_ljx('---------', tmp_time)
+                print('---------', tmp_time)
                 print('number of runnable jobs:', len(JOBS.runnable_jobs), sum([len(queue) for queue in JOBS.queues]))
                 # for queue_id, queue in enumerate(JOBS.queues):
                 #     print(queue_id, ":", [rjob['job_idx'] for rjob in queue])
@@ -757,7 +757,7 @@ def dlas_sim_jobs(scheduler, gputime=False, solve_starvation=0, place=False):
 
                     ret = try_get_job_res(rjob) 
                     assert place==False or ret==True
-                    utils.print_ljx('scheduling: ', rjob['job_idx'], rjob['num_gpu'], ret)
+                    print('scheduling: ', rjob['job_idx'], rjob['num_gpu'], ret)
                     if True == ret:
                         # print('running: ', rjob['job_idx'], tmp_time, scheduler.get_time())
                         rjob['job_counter'] += 1
