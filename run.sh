@@ -28,7 +28,7 @@ shift
 jobs=('cluster_trace')
 setups=("n4g4")
 packing_nums=("4")
-schedule_intervals=("360")          # 6分钟（和论文中一致）
+schedule_intervals=("10")          # 6分钟（和论文中一致）ljx:这里先改为10s
 fast_forwards=("60")
 
 IFS=','
