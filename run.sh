@@ -55,9 +55,9 @@ for setup in ${setups[@]};do                                                    
                             if [ $WORKER_ID -eq 1 ]; then
                                 # start scheduler for the main node
                                 echo -e '\nstart scheduler for the main node\n'
-                                echo "python $THIS_DIR/run.py --cluster_spec=$THIS_DIR/${cluster_spec} --print --scheme=${p} --trace_file=$THIS_DIR/${job_file} --schedule=${s} --log_path=$THIS_DIR/${log_name} --packing_num ${packing_num} --schedule_interval ${schedule_interval} --fast_forwarding ${fast_forward}  >$THIS_DIR/${log_name}/scheduler.out &"
                                 # python $THIS_DIR/run.py --cluster_spec=$THIS_DIR/${cluster_spec} --print --scheme=${p} --trace_file=$THIS_DIR/${job_file} --schedule=${s} --log_path=$THIS_DIR/${log_name} --packing_num ${packing_num} --schedule_interval ${schedule_interval} --fast_forwarding ${fast_forward} & # >$THIS_DIR/${log_name}/scheduler.out &   # ljx
                                 python $THIS_DIR/run.py --cluster_spec=$THIS_DIR/${cluster_spec} --print --scheme=${p} --trace_file=$THIS_DIR/${job_file} --schedule=${s} --log_path=$THIS_DIR/${log_name} --packing_num ${packing_num} --schedule_interval ${schedule_interval} --fast_forwarding ${fast_forward}  >$THIS_DIR/${log_name}/scheduler.out &   # ljx
+                                # python /home/jxlai/project/Muri_exp/run.py --cluster_spec=/home/jxlai/project/Muri_exp/cluster_specs/n4g4.csv --print --scheme=yarn --trace_file=/home/jxlai/project/Muri_exp/trace-data/cluster_trace.csv --schedule=dlas-gpu --log_path=/home/jxlai/project/Muri_exp/results/n4g4jcluster_tracep4si60ff60/dlas-gpu-yarn-4 --packing_num 4 --schedule_interval 60 --fast_forwarding 60
                                 sleep 10s
                             else
                                 # sleep 6m    # ljx
@@ -68,7 +68,7 @@ for setup in ${setups[@]};do                                                    
                             echo -e '\nstart worker\n'
                             echo "python $THIS_DIR/worker.py --master_ip $SCHEDULER_IP --worker_port $WORKER_PORT --trace_name ${job_log} --this-dir ${THIS_DIR} $arg &"
                             python $THIS_DIR/worker.py --master_ip $SCHEDULER_IP --worker_port $WORKER_PORT --trace_name ${job_log} --this-dir ${THIS_DIR} $arg & #>$THIS_DIR/${log_name}/worker${WORKER_ID}.out &     # ljx 由于家目录共享，所以加个WORKER_ID区分一下不同worker.out
-
+                            # python /home/jxlai/project/Muri_exp/worker.py --master_ip 10.0.0.11 --worker_port 9001 --trace_name /home/jxlai/project/Muri_exp/job_logs/n4g4jcluster_tracep4si60ff60/dlas-gpu-yarn-4 --this-dir /home/jxlai/project/Muri_exp
                             wait
 
                             # get the results after execution
