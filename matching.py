@@ -44,7 +44,7 @@ class _Packing(object):
     def add_job(self, rjob):
         self.packing_jobs.extend(rjob.packing_jobs)
 
-    def calc_iteration_time(self, packing=None, ordering=1):
+    def calc_iteration_time(self, packing=None, ordering=1):    # 默认会设置最佳排列
         TT_all = float("inf")
         if packing!=None:
             jobs = self.packing_jobs + packing.packing_jobs
@@ -54,7 +54,7 @@ class _Packing(object):
             self.best_permutation = (jobs[0],)
             return jobs[0].iteration_time
         if ordering==1: # best ordering
-            jobs_permutation = itertools.permutations(jobs)
+            jobs_permutation = itertools.permutations(jobs)     # 生成jobs的所有可能排列，每个排列是一个元组
             for permutation in jobs_permutation:
                 TT = 0.0
                 if FLAGS.multi_resource==4 and len(jobs[0].resource_time)==3:
@@ -512,6 +512,10 @@ class _Blossom_Same(object):
 
     #blossom algorithm
     def blossom_one_round(self, gpu_packing, ordering=1):
+        '''
+            gpu_packing: {gpu_num:[_Packing,...]}
+        '''
+        # 1. 统计原本需要的gpu
         ready_packing = list()
         test_required_gpu = 0
         for key in gpu_packing:
@@ -521,16 +525,16 @@ class _Blossom_Same(object):
             for key in gpu_packing:
                 for packing in gpu_packing[key]:
                     print(key, [rjob.job_idx for rjob in packing.packing_jobs])
-
+        # 2. 遍历不同的gpu需求，进行建图、求匹配
         for key in gpu_packing:
-            tmp_nodes = gpu_packing[key]
+            tmp_nodes = gpu_packing[key]    # 一个_Packing就是一个node
             self.node_cnt = len(tmp_nodes)
             self.n_x = self.node_cnt
             self.edge = [[{"u":u, "v":v, "w":0.0} for v in range(self.node_cnt+1)] for u in range(self.node_cnt+1)]
             self.t = 0
             self.vis = [0 for _ in range(self.node_cnt+1)]
             edge_cnt = 0
-
+            # 2.1 建图
             # print("-------------graph edge-----------")
             for u in range(0, self.node_cnt):
                 for v in range(0, self.node_cnt):
@@ -538,7 +542,7 @@ class _Blossom_Same(object):
                     if u==v or job_sum>FLAGS.packing_num:
                         continue
                     # tmp_weight = tmp_nodes[u].calc_weight(tmp_nodes[v])
-                    tmp_weight = tmp_nodes[u].calc_used_ratio(tmp_nodes[v], ordering)
+                    tmp_weight = tmp_nodes[u].calc_used_ratio(tmp_nodes[v], ordering)   # 计算一个点（_Packind）与另一个点（_Packing）的权重
                     if my_cmp(tmp_weight, FLAGS.weight_lbd*(job_sum/FLAGS.multi_resource))<=0:
                         continue
                     edge_cnt += 1
@@ -546,7 +550,7 @@ class _Blossom_Same(object):
                     # print("node %d: %d"%(u+1, tmp_nodes[u].num_gpu), [rjob.job_idx for rjob in tmp_nodes[u].packing_jobs], ";",  "node %d: %d"%(v+1, tmp_nodes[v].num_gpu), [rjob.job_idx for rjob in tmp_nodes[v].packing_jobs], ";", self.edge[u+1][v+1]["w"])
             # print("-------------graph edge end-----------")
             
-            
+            # 2.2 求匹配
             self.match = [0 for _ in range(self.node_cnt+1)]
             n_matches = 0
             if edge_cnt>0:
@@ -581,19 +585,19 @@ class _Blossom_Same(object):
                     for v in range(1, self.node_cnt+1):
                         print(self.edge[u][v]['w'], end=',')
                     print('\n')
-
+        # 3. 打包
         sorted(ready_packing, key = lambda i: (1-i["used_ratio"])*i["num_gpu"])
-        new_gpu_packing = dict()
+        new_gpu_packing = dict()        # {gpu_num:[_Packing,...]}
         tmp_required_gpu = 0
         for packing in ready_packing:
             num_gpu = packing["num_gpu"]
             if num_gpu not in new_gpu_packing:
                 new_gpu_packing[num_gpu] = list()
-            if self.required_gpu<=self.cluster_gpu:
-                for idx in packing["jobs"]:
+            if self.required_gpu<=self.cluster_gpu:             # 资源充足（GPU够则不合并_Packing）
+                for idx in packing["jobs"]:                     # 遍历各个_Packing的id
                     new_gpu_packing[num_gpu].append(gpu_packing[num_gpu][idx])
                     tmp_required_gpu += num_gpu
-            else:
+            else:                                               # 资源不充足（GPU不够则合并_Packing）
                 tmp_packing = gpu_packing[num_gpu][packing["jobs"][0]]
                 if len(packing["jobs"])==2:
                     tmp_packing.add_job(gpu_packing[num_gpu][packing["jobs"][1]])
@@ -643,11 +647,11 @@ class _Blossom_Same(object):
 
     def run(self, run_jobs_dict, cluster_gpu, ordering=1):
         self.run_jobs_dict = run_jobs_dict
-        gpu_packing = dict()
+        gpu_packing = dict()                        # {gpu_num:[_Packing,...]}
         self.required_gpu = 0
         self.cluster_gpu = cluster_gpu
-        for key in self.run_jobs_dict.keys():
-            gpu_packing[key] = self.run_jobs_to_packing(run_jobs_dict[key])
+        for key in self.run_jobs_dict.keys():       # run_jobs_dict: {gpu_num:[job,...]}
+            gpu_packing[key] = self.run_jobs_to_packing(run_jobs_dict[key]) # 一开始一个job就是一个_Packing，后通过blossom_one_round逐渐合并
             self.required_gpu += len(run_jobs_dict[key])*key
         # print("required gpu: ", self.required_gpu)
         for _ in range(0, FLAGS.packing_num):

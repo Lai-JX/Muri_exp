@@ -26,9 +26,9 @@ placement=('yarn')
 export schedules_all=$1
 shift
 jobs=('cluster_trace')
-setups=("n4g4")
+setups=("n1g8")
 packing_nums=("4")
-schedule_intervals=("60")          # 6分钟（和论文中一致）ljx:这里先改为10s
+schedule_intervals=("360")          # 6分钟（和论文中一致）ljx:这里先改为10s
 fast_forwards=("60")
 
 IFS=','

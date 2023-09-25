@@ -76,7 +76,7 @@ shift
 export NUM_GPU=$1
 shift
 
-THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"    # 获取当前目录的绝对位置
 echo $THIS_DIR
 
 #get real datasets -- imagenet-1k
@@ -169,7 +169,8 @@ hostfile=$THIS_DIR/hostfiles/hostfile-[${JOB_ID0}-${JOB_ID1}-${JOB_ID2}-${JOB_ID
 echo $hostfile
 
 # set common command for mpirun
-COMMON_CMD="--hostfile ${hostfile}" # ljx: 添加hostfile
+# COMMON_CMD="--hostfile ${hostfile}" # ljx: 添加hostfile
+COMMON_CMD="" # ljx: 添加hostfile
 
 if [ $NUM_GPU -ge 4 ]; then         # ljx 改为4，一台机器只有4个gpu
     GPU_PERNODE=4

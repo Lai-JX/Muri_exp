@@ -3,8 +3,10 @@ MPIPATH=/home/jxlai/share/openmpi
 PY=/home/jxlai/anaconda3/envs/muri/bin/python
 rdma=0
 
+# pml: point-to-point messaging layer
+
 if [ "$rdma" = "0" ]; then
-params="-mca pml ob1 -mca btl ^openib \
+params="-mca pml ob1 -mca btl ^openib \         
     -mca btl_tcp_if_include 192.168.0.11/24 \
     -mca mpi_warn_on_fork 0 \
     -bind-to none -map-by slot \

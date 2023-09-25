@@ -120,7 +120,7 @@ def parse_job_file(trace_file):
     job_idx = 0
     for row in reader:
         #add job into JOBS,  JOBS = _TFJobs()
-        if row['model_name'] != 'bert' and row['model_name'] != 'gpt2':     # ljx
+        if row['model_name'] == 'dqn' or row['model_name'] == 'a2c':     # ljx
             JOBS.add_job(row)
             job_idx += 1
         # JOBS.read_job_info(job_idx, 'num_gpu')
@@ -792,7 +792,7 @@ def dlas_sim_jobs(scheduler, gputime=False, solve_starvation=0, place=False):
                         queue.remove(job)
                     queue.extend(pending_job)       # 将pending job放最后
 
-                time.sleep(60)                      # 原本为20，调高一点，让trainer register
+                time.sleep(20)                      # 原本为20，调高一点，让trainer register
             last_check_time = tmp_time
             est_check_time = last_check_time + FLAGS.schedule_interval
             # LOG.checkpoint(tmp_time, scheduler, done_flag or new_flag or demote_flag, secs)
@@ -828,7 +828,7 @@ def multi_resource_blossom_same_sim_jobs(scheduler, gputime=False, know_duration
             LOG.checkpoint_utils(last_check_time, scheduler)
 
             # print('deal with done jobs')
-            # deal with done jobs
+            # 1. deal with done jobs
             done_flag = False
             finished_jobs = []
             while not scheduler._controller.done_queue.empty():
@@ -838,7 +838,7 @@ def multi_resource_blossom_same_sim_jobs(scheduler, gputime=False, know_duration
                 # e_job['last_finish_time'] = finished_time
                 e_packing = e_job['packing']
                 for ejob_id in e_packing.packing_jobs:
-                    ejob = JOBS.find_runnable_job(ejob_id.job_idx)
+                    ejob = JOBS.find_runnable_job(ejob_id.job_idx)  # 遍历同个pack的job
                     finished_jobs.append(ejob['job_idx'])
                     if returncode==0:
                         ejob['last_finish_time'] = finished_time
@@ -850,7 +850,7 @@ def multi_resource_blossom_same_sim_jobs(scheduler, gputime=False, know_duration
                 scheduler._trainers.pop(job_id)
 
             # print('deal with new jobs:')
-            # deal with new jobs
+            # 2. deal with new jobs
             new_flag = False
             while scheduler.has_ready_jobs(scheduler.get_time()):
                 event = JOBS.job_events.pop(0)
@@ -873,12 +873,12 @@ def multi_resource_blossom_same_sim_jobs(scheduler, gputime=False, know_duration
                     if rjob['job_idx'] in finished_jobs or running_jobs == 0:
                         finished_time, finished_iter, done_idx = JOBS.calc_packing_finished_info(rjob, tmp_time, last_check_time)
                         rjob['finished_info'] = (finished_time, finished_iter, done_idx)
-                    else:
+                    else:                   # 3. kill jobs running but not finished)
                         job_list = []
                         packing = rjob['packing']
-                        packing.calc_iteration_time()
+                        packing.calc_iteration_time()           # 计算排列的迭代时间
                         max_job_id = -1
-                        for pjob in packing.best_permutation:
+                        for pjob in packing.best_permutation:   # best_permutation:最佳排列
                             if pjob==None:
                                 job_list.append(None)
                             else:
@@ -902,7 +902,7 @@ def multi_resource_blossom_same_sim_jobs(scheduler, gputime=False, know_duration
                     # print('finished_info: ', rjob['job_idx'], finished_time, finished_iter, done_idx)
             for tmp_num in range(1, FLAGS.packing_num+1):
                 # print(tmp_num)
-                tmp_list = JOBS.overhead_list[tmp_num]
+                tmp_list = JOBS.overhead_list[tmp_num]  # 负载的相关统计
                 tmp_n = len(tmp_list)
                 if tmp_n>0:
                     tmp_mean = sum(tmp_list)/tmp_n
@@ -910,7 +910,7 @@ def multi_resource_blossom_same_sim_jobs(scheduler, gputime=False, know_duration
                     tmp_std = (tmp_ss/tmp_n)**0.5
                     scheduler._logger.info(f'scheduler, error rate between sim and real: {tmp_num} jobs, mean {tmp_mean}, std {tmp_std}')
             for rjob in JOBS.runnable_jobs:
-                if 'RUNNING' == rjob['status']:
+                if 'RUNNING' == rjob['status']:     # 4. 这里对应的应该是returncode为0的作业，returncode为0仅代表job有进展，但不代表job已经完成了！
                     tmp = tmp_time - rjob['last_check_time']
                     finished_time, finished_iter, done_idx = rjob['finished_info']
                     for _ in range(done_idx):
@@ -952,10 +952,13 @@ def multi_resource_blossom_same_sim_jobs(scheduler, gputime=False, know_duration
                     # print(tmp_time, 'check: ending', rjob['job_idx'], rjob['remaining_iterations'], rjob['last_check_time'])
             for djob in done_job_list:
                 JOBS.runnable_jobs.remove(djob)
+                
+            ## 调度
             running_jobs = 0
             if done_flag or new_flag:
                 scheduler.clear_src_utils()
-                #sort jobs with shortest first
+                #sort jobs with shortest first 
+                # 5. 按优先级排序
                 for rjob in JOBS.runnable_jobs:
                     if rjob['status'] != 'END':
                         if know_duration: 
@@ -969,19 +972,19 @@ def multi_resource_blossom_same_sim_jobs(scheduler, gputime=False, know_duration
                             else:
                                 rjob['sort_val']=rjob['total_executed_time']
                 JOBS.runnable_jobs.sort(key = lambda e:e.__getitem__('sort_val'))
-
+                # 6. 打包
                 run_jobs = list() # pending jobs to running
                 preempt_jobs = list() # running jobs to other status
-                GPU_num_job = dict() # num_gpu, all runnable jobs
-                GPU_chosen_job = dict() # num_gpu, number of chosen jobs for packing
-                GPU_nums = dict() # num_gpu, number of possible packings
+                GPU_num_job = dict() # num_gpu, all runnable jobs                       {gpu_num:[job,...]}
+                GPU_chosen_job = dict() # num_gpu, number of chosen jobs for packing    {gpu_num:job_num}   
+                GPU_nums = dict() # num_gpu, number of possible packings                {gpu_num:packing_nums}
                 required_gpu = 0
                 for rjob in JOBS.runnable_jobs:
                     rjob['packing_used'] = 0
                     num_gpu = rjob['num_gpu']
                     if num_gpu not in GPU_num_job:
                         GPU_num_job[num_gpu] = list()
-                    GPU_num_job[num_gpu].append(rjob)
+                    GPU_num_job[num_gpu].append(rjob)       # 将job按需要的gpu数进行分类
                     if num_gpu not in GPU_chosen_job:
                         GPU_chosen_job[num_gpu] = 0
                         GPU_nums[num_gpu] = 0
@@ -995,20 +998,21 @@ def multi_resource_blossom_same_sim_jobs(scheduler, gputime=False, know_duration
                     if ret == True:
                         # print('select jobs to blossom: ', rjob['job_idx'], rjob['num_gpu'], rjob['sort_val'])
                         up_bd = min(GPU_chosen_job[num_gpu]+FLAGS.packing_num, len(GPU_num_job[num_gpu]))
-                        GPU_nums[num_gpu] += 1
-                        for tmp_id in range(GPU_chosen_job[num_gpu], up_bd):
+                        GPU_nums[num_gpu] += 1                                  # 可打包数+1
+                        for tmp_id in range(GPU_chosen_job[num_gpu], up_bd):    # 将GPU_num_job[num_gpu]新加的可打包作业的'packing_used'置1。有个bug，这里只考虑了gpu数，没考虑显存大小等问题，如果显存有的大有的小应该选最大
                             GPU_num_job[num_gpu][tmp_id]['packing_used']=1
-                        GPU_chosen_job[num_gpu] = up_bd
+                        GPU_chosen_job[num_gpu] = up_bd                         # 更新num_gpu对应的作业数
                 for key in GPU_num_job.keys():
                     GPU_num_job[key] = GPU_num_job[key][:GPU_chosen_job[key]]
-                    required_gpu += GPU_chosen_job[key]*key
+                    required_gpu += GPU_chosen_job[key]*key                     # 总的需要的gpu数
 
+                # 7. 根据Blossom算法得到最佳打包方案（包括资源顺序）
                 # print("before blossom: ")
                 # for key in GPU_num_job.keys():
                 #     print([rjob['job_idx'] for rjob in GPU_num_job[key]])
                 if blossom==True:
                     time_blossom_0 = time.time()
-                    packings = Blossom_Same.run(GPU_num_job, CLUSTER.num_gpu, ordering)
+                    packings = Blossom_Same.run(GPU_num_job, CLUSTER.num_gpu, ordering) # 会不断打包，直至GPU满足需求
                     time_blossom_1 = time.time()
                     blossom_cnt += 1
                     blossom_sum += time_blossom_1 - time_blossom_0
@@ -1033,17 +1037,18 @@ def multi_resource_blossom_same_sim_jobs(scheduler, gputime=False, know_duration
                 # for key in packings.keys():
                 #     for packing in packings[key]:
                 #         print(key, [minijob.job_idx for minijob in packing.packing_jobs])
-
+                
+                # 8. 分配资源，下发任务
                 CLUSTER.empty_infra()
-                vis_flag = dict()
-                packings_keys = list(packings.keys()) # possible num_gpu
-                packings_keys.sort(reverse=True)
-                for packings_key in packings_keys:
-                    for packing in packings[packings_key]:
+                vis_flag = dict()           # {job_idx:True or False}
+                packings_keys = list(packings.keys())                   # possible num_gpu                # packings为 {gpu_num:[_Packing,...]}
+                packings_keys.sort(reverse=True)                        # 优先选择需要gpu少的
+                for packings_key in packings_keys:                      # 遍历每种gpu需求
+                    for packing in packings[packings_key]:              # 遍历每个_Packing
                         job_list = []
                         rjob = None
-                        packing.calc_iteration_time(ordering=ordering)
-                        for pjob in packing.best_permutation:
+                        packing.calc_iteration_time(ordering=ordering)  # 除了计算迭代时间，还会设置_Packing中任务的最佳顺序
+                        for pjob in packing.best_permutation:           # 迭代每个job
                             if pjob==None:
                                 job_list.append(None)
                             else:
@@ -1054,9 +1059,9 @@ def multi_resource_blossom_same_sim_jobs(scheduler, gputime=False, know_duration
                                     del tmp_job['placements'][:]
                                 vis_flag[pjob.job_idx] = True
                                 job_list.append(tmp_job)
-                                if rjob == None or tmp_job['job_idx']>rjob['job_idx']:
+                                if rjob == None or tmp_job['job_idx']>rjob['job_idx']:  # 每个_Packing中找idx最大的job作为代表
                                     rjob = tmp_job
-                        while len(job_list)<FLAGS.multi_resource:
+                        while len(job_list)<FLAGS.multi_resource:       
                             job_list.append(None)
                         # print('placement: ', rjob['job_idx'], [pjob.job_idx if pjob!=None else -1 for pjob in packing.best_permutation], rjob['placements'])
                         ret = try_get_job_res(rjob)
