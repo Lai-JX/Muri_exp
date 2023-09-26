@@ -2,3 +2,4 @@ __pycache__
 results
 log
 tf_log
+workloads/*.out

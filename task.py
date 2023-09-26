@@ -37,6 +37,7 @@ class Task(object):
     def real_job(self):
         bash_cmd = f'bash {self._this_dir}/workloads/run.sh'
         for i in range(self._job_num):
+            # 设置job的参数，依次为model    batch-size    num-worker    prefetch-factor    train-dir    iters    job-id         iters为剩余迭代次数
             bash_cmd += f' {self._job_name[i]} {self._batch_size[i]} 0 2 -1 {self._iterations[i]} {self._job_id[i]} {self._job_counter[i]}' # 0、2、-1分别代表num_worker、prefetch_factor和train_dir
         bash_cmd += f' {self._num_gpu}'
         bash_cmd += f' --scheduler-ip {self._scheduler_ip}'
@@ -84,7 +85,7 @@ class Task(object):
     
 
     @property
-    def return_code(self):
+    def return_code(self):              # 检查进程是否终止，如果终止返回 returncode，否则返回 None
         return self._handler.poll()
 
     @property

@@ -50,7 +50,7 @@ class Controller(object):
 
     def execute(self, job_info):
         self._logger.info(f'controller execute job {list(job_info.job_id)}, use node: {list(job_info.node_id)}')
-        self._workers[min(list(job_info.node_id))].execute(job_info)        # 这里按理说应该向所有node_id对应的worker发送execute命令吧
+        self._workers[min(list(job_info.node_id))].execute(job_info)        # 这里按理说应该向所有node_id对应的worker发送execute命令 → 不用，交给hovorod和mpi去管
     
 
     def kill(self, job_info):

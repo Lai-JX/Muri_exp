@@ -91,13 +91,13 @@ def train():
     iter_list.sort()
     if iter_list[0] == 0:
         del iter_list[0]
-    print(iter_list)
-    args.iters = iter_list[-1]
+    print(iter_list)            # 每个job的剩余迭代次数
+    args.iters = iter_list[-1]  # 四个job中剩余迭代次数最高的
     tmp_iter = 0
     itertime_list = []
     last_iter = 10
     
-    if hvd.rank()==0:
+    if hvd.rank()==0:           # 启用子进程获取资源使用情况
         secs = 50
 
         # start subprocess
@@ -122,10 +122,10 @@ def train():
     while cur_iter < while_up:
 
         # ------- stage 1 -------
-        # data 0
+        # data 0        
         if cur_iter<sargs0['iters']:
             thread0 = myThread(0)
-            thread0.start()
+            thread0.start()     # 获取数据，最终调用模型的get_data方法(改方法除了获取数据，也会输出日志，如：2023-09-12 15:41:27,563 - root - INFO: steps 981, episodic_return_train 0.0)
 
         if cur_iter>0:
             # fp/bp 2
@@ -189,14 +189,14 @@ def train():
             trainer.record(time_end-time_st)
             if cur_iter > last_iter:
                 time_all += time_end-time_st
-                if cur_iter >= iter_list[tmp_iter]:
-                    itertime_list.append(time_all/(cur_iter - last_iter))
-                    last_iter = iter_list[tmp_iter]+5
+                if cur_iter >= iter_list[tmp_iter]:     # 某个job完成了
+                    itertime_list.append(time_all/(cur_iter - last_iter))   # 记录迭代时间
+                    last_iter = iter_list[tmp_iter]+5   # 为什么要加5
                     tmp_iter += 1
                     time_all = 0
             print(cur_iter, " time: ", time_end-time_st)
         time_st = time.time()
-    time_io = time.time()-time_st
+    time_io = time.time()-time_st   # 这里减去的应该是time_io_st？
 
     if hvd.rank()==0:
         print("Model Info:")
@@ -218,7 +218,7 @@ def train():
             itertime_list = [0]
         print('itertime: ', itertime_list)
 
-        # handle gpu
+        # handle gpu 计算gpu利用率
         if visible_device_str!=None:
             gpu_process.send_signal(signal.SIGINT)
             gpu_process.terminate()
@@ -241,10 +241,10 @@ def train():
         else:
             gpu_util = 0
 
-        # handle cpu
+        # handle cpu    计算cpu利用率
         cpu_process.wait()
         cpu_util_list = []
-        print(cur_pid)
+        print("cur_pid:",cur_pid)
         util_str_list = open(args.this_dir + "/profiling_cpu_"+ str(cur_pid) +".out", "r").read().split('\n')
         for i in range(secs):
             idle = float(util_str_list[i].split(',')[3].split()[-2])
@@ -255,6 +255,7 @@ def train():
         os.system("rm -rf "+args.this_dir+"/profiling_cpu_"+str(cur_pid)+".out")
         # print(args.this_dir+"/profiling_cpu_"+str(cur_pid)+".out")
 
+        # 计算IO速度
         if itertime_list[0]!=0:
             io_read = data_size / itertime_list[0]
         else:
