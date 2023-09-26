@@ -69,8 +69,8 @@ class Task(object):
         with open(self.log_path, 'w+') as f:
             self._handler = subprocess.Popen(
                 cmd, 
-                stdout=1,
-                stderr=2,               # 之后再改为f
+                stdout=f,
+                stderr=f,               # 之后再改为f
                 env=environ_dict,
             )
 

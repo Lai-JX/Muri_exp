@@ -602,6 +602,7 @@ class _Cluster(object):
         if cross machines, still try to consolidate.
         if can't consolidate, consider spreed the jobs;
         also PS is randomly placed on the selected machines
+        先考虑尽量少的节点（用节点的所有gpu），如果无法这样，则分散利用各个节点的空闲gpu，但这样还是没有使用mps
         '''
 
         num_ps = len(job['ps_network'])
@@ -628,10 +629,10 @@ class _Cluster(object):
         # print(num_gpu_list)
 
         # go through workers
-        w_node_list = list()
-        w_switch_list = list()
+        w_node_list = list()        # 每个gpu对于的node
+        w_switch_list = list()      # 每个gpu对于的switch编号
         p_done = True 
-        for i in range(0, num_node):
+        for i in range(0, num_node):        # 一个节点一个节点分配
             switch_idx = random.randint(0, self.num_switch - 1)
             switch_s_idx = switch_idx
             allocated = False
