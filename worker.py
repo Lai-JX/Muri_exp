@@ -62,6 +62,7 @@ class Worker(object):
                 self._client_for_master.done(job_id, job_counter, self._worker_id, task._gpus, task.return_code)
                 finished_tasks.append((job_id, job_counter))
                 if task.return_code != 0:
+                    print("job_id:",job_id)
                     with open(f'{self._this_dir}/workloads/test_{job_id}.txt', 'r') as f:
                         error_text = f.read()
                         self._logger.info(f'error info: {job_id} {job_counter} \n'+error_text)
