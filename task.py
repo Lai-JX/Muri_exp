@@ -103,4 +103,5 @@ class Task(object):
                 path = f'{self._trace_name}/{self._job_id[i]}-{self._job_counter[i]}-{self._job_name[i]}'
             else:
                 path += f'_{self._job_id[i]}-{self._job_counter[i]}-{self._job_name[i]}'
+        print("path:",path)
         return path + '.txt'
