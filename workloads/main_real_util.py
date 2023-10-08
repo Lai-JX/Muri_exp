@@ -1,3 +1,4 @@
+# encoding: utf-8
 import torch
 from options import parser
 import torch.profiler
