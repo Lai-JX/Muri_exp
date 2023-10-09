@@ -1,0 +1,18 @@
+output setted by LJX:
+	main_real_util
+output setted by LJX:
+	main_real_util    1
+output setted by LJX:
+	main_real_util    2
+output setted by LJX:
+	main_real_util    3
+output setted by LJX:
+	main_real_util    4
+output setted by LJX:
+	main_real_util    5
+output setted by LJX:
+	main_real_util    6
+before network
+cuda:0
+after network
+cuda:0
