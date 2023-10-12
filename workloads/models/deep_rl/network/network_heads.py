@@ -13,7 +13,7 @@ class VanillaNet(nn.Module, BaseNet):
         super(VanillaNet, self).__init__()
         self.fc_head = layer_init(nn.Linear(body.feature_dim, output_dim))
         self.body = body
-        print(Config.DEVICE)
+        # print(Config.DEVICE)
         self.to(Config.DEVICE)  # blocked here "cuda:0"
         # self.to("cuda:0")         
         '''

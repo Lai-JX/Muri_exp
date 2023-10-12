@@ -52,9 +52,7 @@ class DQNAgent(BaseAgent):
         config.lock = mp.Lock()
         self.replay = config.replay_fn()
         self.actor = DQNActor(config)
-        print("before network")
         self.network = config.network_fn()  # blocked here
-        print("after network")
         self.network.share_memory()
         self.target_network = config.network_fn()
         self.target_network.load_state_dict(self.network.state_dict())
