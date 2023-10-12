@@ -16,6 +16,6 @@ push_all:
 run:
 	git pull gitee master; ./run.sh 192.168.1.104 9001 9013 1 dlas-gpu
 run1:
-	git pull gitee master; ./run.sh 192.168.1.104 9001 9013 2 dlas-gpu
+	./run.sh 192.168.1.104 9001 9013 2 dlas-gpu
 reset:
 	git fetch; git reset --hard HEAD; git merge origin/master

@@ -45,8 +45,9 @@ class Scheduler(object):
 
     def _register_trainer_impl(self, trainer_ip, trainer_port, job_id_list):
         success = True
-        self._logger.info(f'scheduler, before register, {job_id} {trainer_ip}:{trainer_port} {self._trainers.keys()}')
         job_id = max(job_id_list)
+        self._logger.info(f'scheduler, before register, {job_id} {trainer_ip}:{trainer_port} {self._trainers.keys()}')
+        
         # assert job_id not in self._trainers
         tmp_client = scheduler_client.SchedulerClientForTrainer(self._logger, job_id_list, trainer_ip, trainer_port)
         self._trainers[job_id] = tmp_client
