@@ -51,7 +51,7 @@ for setup in ${setups[@]};do                                                    
                             mkdir $THIS_DIR/$log_name
                             job_log="$THIS_DIR/job_logs/${trace_name}/${s}-${p}-${packing_num}"             # worker.py的log path: job_logs/n4g4jcluster_tracep4si360ff60/dlas-gpu-yarn-4
                             rm -rf $job_log
-                            echo "running..." $setup $job $s 'worker-id:'$WORKER_ID
+                            echo "running..." $setup $job $s 'worker-id:'$WORKER_ID $SCHEDULER_IP
                             if [ $WORKER_ID -eq 1 ]; then
                                 # start scheduler for the main node
                                 echo -e '\nstart scheduler for the main node\n'
