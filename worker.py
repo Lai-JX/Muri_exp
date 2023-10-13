@@ -67,7 +67,7 @@ class Worker(object):
                         error_text = f.read()
                         self._logger.info(f'error info: {job_id} {job_counter} \n'+error_text)
             
-            for (job_id, job_counter) in finished_tasks:
+            for (job_id, job_counter) in finished_tasks: 
                 self._tasks.pop((job_id, job_counter))
             
             time.sleep(2)

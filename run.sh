@@ -60,7 +60,7 @@ for setup in ${setups[@]};do                                                    
                                 # python /home/jxlai/project/Muri_exp/run.py --cluster_spec=/home/jxlai/project/Muri_exp/cluster_specs/n4g4.csv --print --scheme=yarn --trace_file=/home/jxlai/project/Muri_exp/trace-data/cluster_trace.csv --schedule=dlas-gpu --log_path=/home/jxlai/project/Muri_exp/results/n4g4jcluster_tracep4si60ff60/dlas-gpu-yarn-4 --packing_num 4 --schedule_interval 60 --fast_forwarding 60
                                 sleep 10s
                             else
-                                # sleep 6m    # ljx
+                                # sleep 6m    # ljx 
                                 sleep 10s
                             fi
 

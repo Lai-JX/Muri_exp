@@ -271,13 +271,12 @@ def train():
 
 
 if __name__ == '__main__':
-    utils.print_ljx("main_real_util")
+    # utils.print_ljx("main_real_util")
     
     args = parser.parse_args()
     args.cuda = not args.no_cuda and torch.cuda.is_available()
     hvd.init()
     torch.manual_seed(args.seed)
-
     if args.cuda:
         # Horovod: pin GPU to local rank. 一个gpu一个进程
         torch.cuda.set_device(hvd.local_rank())

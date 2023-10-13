@@ -33,9 +33,11 @@ class Trainer(object):
         success = False
         while success == False:
             success = self._client_for_scheduler.register_trainer(self._trainer_ip, self._trainer_port, self._job_id)
-
+            # utils.print_ljx("register:",success)    # success=(Flase,None)    /   True
+        
     def report_itertime(self, iter_time, src_utils):
         success = self._client_for_scheduler.report_itertime(self._job_id, iter_time, src_utils)
+        utils.print_ljx("report_itertime:", success)
         self._logger.info(f'job {self._job_id} reported iteration time {iter_time} and resource utils {src_utils}')
 
     def init_stats(self):

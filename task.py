@@ -64,6 +64,7 @@ class Task(object):
         with open(hostfile_dir+f'/hostfile-[{job_id_str}]-[{job_counter_str}]', 'w') as f:
             f.writelines(hostfile_list)
         utils.print_ljx("task.run:hostfile_list:", hostfile_list)
+        utils.print_ljx("log path after here:",self.log_path, '\n')
         environ_dict = dict(os.environ)
         environ_dict['CUDA_VISIBLE_DEVICES'] = self._gpus
         with open(self.log_path, 'w+') as f:
@@ -103,5 +104,4 @@ class Task(object):
                 path = f'{self._trace_name}/{self._job_id[i]}-{self._job_counter[i]}-{self._job_name[i]}'
             else:
                 path += f'_{self._job_id[i]}-{self._job_counter[i]}-{self._job_name[i]}'
-        print("path:",path)
         return path + '.txt'
