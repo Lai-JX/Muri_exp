@@ -574,7 +574,7 @@ def dlas_sim_jobs(scheduler, gputime=False, solve_starvation=0, place=False):
             while scheduler.get_time()-last_check_time<FLAGS.schedule_interval and scheduler.has_running_trainers(running_jobs):                    # 还没到调度时间，且还有job在运行
                 # print("waiting for trainers: ", scheduler.get_time(), running_jobs, scheduler.has_running_trainers(running_jobs), scheduler._trainers.keys())
                 time.sleep(5)
-            # utils.print_ljx("assert len(scheduler._trainers.keys())==running_jobs",len(scheduler._trainers.keys()), running_jobs)
+            utils.print_ljx("assert len(scheduler._trainers.keys())==running_jobs",len(scheduler._trainers.keys()), running_jobs)
             assert len(scheduler._trainers.keys())==running_jobs
             if running_jobs>0:
                 time.sleep(2)
@@ -792,7 +792,7 @@ def dlas_sim_jobs(scheduler, gputime=False, solve_starvation=0, place=False):
                         queue.remove(job)
                     queue.extend(pending_job)       # 将pending job放最后
 
-                time.sleep(0)                      # 原本为20，调高一点，让trainer register
+                time.sleep(5)                      # 原本为20，调高一点，让trainer register
             last_check_time = tmp_time
             est_check_time = last_check_time + FLAGS.schedule_interval
             # LOG.checkpoint(tmp_time, scheduler, done_flag or new_flag or demote_flag, secs)

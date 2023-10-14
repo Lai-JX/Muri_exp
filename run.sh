@@ -28,7 +28,7 @@ shift
 jobs=('cluster_trace')
 setups=("n2g2")
 packing_nums=("4")
-schedule_intervals=("10")          # 6分钟（和论文中一致）ljx:这里先改为10s
+schedule_intervals=("60")          # 6分钟（和论文中一致）ljx:这里先改为10s
 fast_forwards=("60")
 
 IFS=','
@@ -61,7 +61,7 @@ for setup in ${setups[@]};do                                                    
                                 sleep 10s
                             else
                                 # sleep 6m    # ljx 
-                                sleep 10s
+                                sleep 60s
                             fi
 
                             # start worker for all nodes. 这里only one node?! → 根据WORKER_ID来指定

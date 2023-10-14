@@ -830,7 +830,7 @@ class _TFJobs(object):
             node_id = node['id']
             node_id_list.append(node_id)
             assert node_id not in gpu_list
-            assert len(placement['nodes'])==1 or (len(placement['nodes'])>1 and len(node['gpu_list'])==4)       # ljx: 将8改为4，每个节点只有4个gpu
+            assert len(placement['nodes'])==1 or (len(placement['nodes'])>1 and len(node['gpu_list'])==2)       # ljx: 将8改为2，每个节点只有4个gpu
             for gpu in node['gpu_list']:
                 if node_id not in gpu_list:
                     gpu_list[node_id] = str(gpu)

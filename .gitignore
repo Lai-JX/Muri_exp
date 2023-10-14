@@ -3,3 +3,5 @@ results
 log
 tf_log
 workloads/*.out
+workloads/hostfiles/*
+workloads/*.txt
