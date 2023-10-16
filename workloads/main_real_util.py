@@ -92,7 +92,7 @@ def train():
     iter_list.sort()
     if iter_list[0] == 0:
         del iter_list[0]
-    print(iter_list)            # 每个job的剩余迭代次数
+    # print(iter_list)            # 每个job的剩余迭代次数
     args.iters = iter_list[-1]  # 四个job中剩余迭代次数最高的
     tmp_iter = 0
     itertime_list = []
@@ -195,7 +195,7 @@ def train():
                     last_iter = iter_list[tmp_iter]+5   # 为什么要加5
                     tmp_iter += 1
                     time_all = 0
-            print(cur_iter, " time: ", time_end-time_st)
+            # print(cur_iter, " time: ", time_end-time_st)
         time_st = time.time()
     time_io = time.time()-time_st   # 这里减去的应该是time_io_st？
 
@@ -279,6 +279,7 @@ if __name__ == '__main__':
     torch.manual_seed(args.seed)
     if args.cuda:
         # Horovod: pin GPU to local rank. 一个gpu一个进程
+        print("hvd.local_rank():",hvd.local_rank())
         torch.cuda.set_device(hvd.local_rank())
         torch.cuda.manual_seed(args.seed)
     if hvd.rank()==0:                       # 第一个进程

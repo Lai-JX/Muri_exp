@@ -21,6 +21,8 @@ shift
 cd $THIS_DIR
 bash $THIS_DIR/prepare_env.sh $SCHEDULER_IP $WORKER_PORT $TRAINER_PORT $WORKER_ID
 
+service ssh restart     # 防止系统抽风
+
 # set the scheduling policy and related parameters
 placement=('yarn')
 export schedules_all=$1
@@ -28,7 +30,7 @@ shift
 jobs=('cluster_trace')
 setups=("n2g2")
 packing_nums=("4")
-schedule_intervals=("60")          # 6分钟（和论文中一致）ljx:这里先改为10s
+schedule_intervals=("360")          # 6分钟（和论文中一致）ljx:这里先改为10s
 fast_forwards=("60")
 
 IFS=','
@@ -61,13 +63,13 @@ for setup in ${setups[@]};do                                                    
                                 sleep 10s
                             else
                                 # sleep 6m    # ljx 
-                                sleep 60s
+                                sleep 6m
                             fi
 
                             # start worker for all nodes. 这里only one node?! → 根据WORKER_ID来指定
                             echo -e '\nstart worker\n'
                             echo "python $THIS_DIR/worker.py --master_ip $SCHEDULER_IP --worker_port $WORKER_PORT --trace_name ${job_log} --this-dir ${THIS_DIR} $arg &"
-                            python $THIS_DIR/worker.py --master_ip $SCHEDULER_IP --worker_port $WORKER_PORT --trace_name ${job_log} --this-dir ${THIS_DIR} $arg & #>$THIS_DIR/${log_name}/worker${WORKER_ID}.out &     # ljx 由于家目录共享，所以加个WORKER_ID区分一下不同worker.out
+                            python $THIS_DIR/worker.py --master_ip $SCHEDULER_IP --worker_port $WORKER_PORT --trace_name ${job_log} --this-dir ${THIS_DIR} $arg >$THIS_DIR/${log_name}/worker${WORKER_ID}.out &     # ljx 由于家目录共享，所以加个WORKER_ID区分一下不同worker.out
                             # python /home/jxlai/project/Muri_exp/worker.py --master_ip 10.0.0.11 --worker_port 9001 --trace_name /home/jxlai/project/Muri_exp/job_logs/n4g4jcluster_tracep4si60ff60/dlas-gpu-yarn-4 --this-dir /home/jxlai/project/Muri_exp
                             wait
 

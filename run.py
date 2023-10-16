@@ -76,7 +76,7 @@ flags.DEFINE_integer('multi_resource', 4,
                 '''Part of job spec: the num of resources used for each job, default is 4''')
 flags.DEFINE_float('weight_lbd', 0.0, '''The factor of the lower bound of expected weight (i jobs packing of n resources: i/n)''')
 
-flags.DEFINE_boolean('print', False, 
+flags.DEFINE_boolean('print', True,         # ljx: 原本默认为Flase 
                 '''Enable print out information, default is False''')
 flags.DEFINE_boolean('flush_stdout', True, 
                 '''Flush stdout, default is True''')
@@ -120,7 +120,7 @@ def parse_job_file(trace_file):
     job_idx = 0
     for row in reader:
         #add job into JOBS,  JOBS = _TFJobs()
-        if row['model_name'] == 'dqn' or row['model_name'] == 'a2c':     # ljx
+        if (row['model_name'] == 'dqn' or row['model_name'] == 'a2c') and int(row['num_gpu']) <= 4:     # ljx
             JOBS.add_job(row)
             job_idx += 1
         # JOBS.read_job_info(job_idx, 'num_gpu')
@@ -574,7 +574,7 @@ def dlas_sim_jobs(scheduler, gputime=False, solve_starvation=0, place=False):
             while scheduler.get_time()-last_check_time<FLAGS.schedule_interval and scheduler.has_running_trainers(running_jobs):                    # 还没到调度时间，且还有job在运行
                 # print("waiting for trainers: ", scheduler.get_time(), running_jobs, scheduler.has_running_trainers(running_jobs), scheduler._trainers.keys())
                 time.sleep(5)
-            utils.print_ljx("assert len(scheduler._trainers.keys())==running_jobs",len(scheduler._trainers.keys()), running_jobs)
+            # scheduler._logger.info(f'{"ljx:assert len(scheduler._trainers.keys())==running_jobs",len(scheduler._trainers.keys()), running_jobs}')
             assert len(scheduler._trainers.keys())==running_jobs
             if running_jobs>0:
                 time.sleep(2)
@@ -634,6 +634,7 @@ def dlas_sim_jobs(scheduler, gputime=False, solve_starvation=0, place=False):
             
             demote_flag = False # have demote/promote or not
             tmp_time = scheduler.get_time()
+            print(tmp_time)
             assert tmp_time - last_check_time > FLAGS.schedule_interval or tmp_time < FLAGS.schedule_interval
             done_job_list = list()
             for rjob in JOBS.runnable_jobs:
@@ -653,7 +654,7 @@ def dlas_sim_jobs(scheduler, gputime=False, solve_starvation=0, place=False):
                         rjob['remaining_iterations'] = 0
                         rjob['remaining_time'] = 0
                         CLUSTER.release_job_res(rjob)
-                        LOG.job_complete(rjob, rjob['last_check_time'])
+                        LOG.job_complete(rjob, rjob['last_check_time'])             # job完成后将相关信息写入result/..../job.csv
                         finished_job_cnt += 1
                         scheduler._logger.info(f'scheduler finishes {finished_job_cnt} jobs in all!')
                         done_job_list.append(rjob)
@@ -709,7 +710,7 @@ def dlas_sim_jobs(scheduler, gputime=False, solve_starvation=0, place=False):
                 tmp_mean = sum(tmp_list)/tmp_n
                 tmp_ss = sum([(x-tmp_mean)**2 for x in tmp_list])
                 tmp_std = (tmp_ss/tmp_n)**0.5
-                scheduler._logger.info(f'scheduler, error rate between sim and real: mean {tmp_mean}, std {tmp_std}')
+                # scheduler._logger.info(f'scheduler, error rate between sim and real: mean {tmp_mean}, std {tmp_std}')
             for djob in done_job_list:              # 移除所有完成的job
                 JOBS.runnable_jobs.remove(djob)
                 JOBS.queues[djob['q_id']].remove(djob)
@@ -721,7 +722,7 @@ def dlas_sim_jobs(scheduler, gputime=False, solve_starvation=0, place=False):
             # 3. demote_flag: 优先队列变化（饥饿 or 时间乘gpu）
             if done_flag or new_flag or demote_flag:
                 scheduler.clear_src_utils()
-                # utils.print_ljx('---------', tmp_time)
+                
                 print('number of runnable jobs:', len(JOBS.runnable_jobs), sum([len(queue) for queue in JOBS.queues]))
                 # for queue_id, queue in enumerate(JOBS.queues):
                 #     print(queue_id, ":", [rjob['job_idx'] for rjob in queue])
@@ -757,7 +758,7 @@ def dlas_sim_jobs(scheduler, gputime=False, solve_starvation=0, place=False):
 
                     ret = try_get_job_res(rjob) 
                     assert place==False or ret==True
-                    utils.print_ljx('scheduling: ','job_idx:', rjob['job_idx'],'num_gpu:', rjob['num_gpu'], ret)
+                    scheduler._logger.info(f"{'ljx: scheduling: ','job_idx:', rjob['job_idx'],'num_gpu:', rjob['num_gpu'], ret}")
                     if True == ret:
                         # print('running: ', rjob['job_idx'], tmp_time, scheduler.get_time())
                         rjob['job_counter'] += 1
@@ -767,7 +768,7 @@ def dlas_sim_jobs(scheduler, gputime=False, solve_starvation=0, place=False):
                         if rjob['status'] == 'PENDING':
                             run_jobs.append(rjob)
                         jobinfo = JOBS.to_jobinfo(rjob)
-                        utils.print_ljx("execute (called by schedule._controller)! ")
+                        # scheduler._logger.info("execute (called by schedule._controller)! ")
                         scheduler._controller.execute(jobinfo)
                     else:                               # 没有资源不够的job，先抢占
                         if rjob['status'] == 'RUNNING':
@@ -792,7 +793,7 @@ def dlas_sim_jobs(scheduler, gputime=False, solve_starvation=0, place=False):
                         queue.remove(job)
                     queue.extend(pending_job)       # 将pending job放最后
 
-                time.sleep(5)                      # 原本为20，调高一点，让trainer register
+                time.sleep(20)                      # 原本为20，调高一点，让trainer register
             last_check_time = tmp_time
             est_check_time = last_check_time + FLAGS.schedule_interval
             # LOG.checkpoint(tmp_time, scheduler, done_flag or new_flag or demote_flag, secs)

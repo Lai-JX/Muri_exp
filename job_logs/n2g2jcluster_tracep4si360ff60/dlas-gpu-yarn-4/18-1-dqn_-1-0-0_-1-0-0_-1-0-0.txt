@@ -1,0 +1,160 @@
+
+===/root/nfs-share/Muri_exp/workloads
+--scheduler-ip 192.168.1.104 --trainer-port 9022 --this-dir /root/nfs-share/Muri_exp/workloads
+-------------------------------
+mpirun -n 1  --allow-run-as-root --oversubscribe --prefix /root/share/openmpi -hostfile /root/nfs-share/Muri_exp/workloads/hostfiles/hostfile-[18--1--1--1]-[1-0-0-0] -bind-to none -map-by slot -mca btl_tcp_if_include 192.168.1.104/24  -x LD_LIBRARY_PATH -x PATH -mca pml ob1 -mca btl ^openib /root/anaconda3/envs/muri/bin/python3 /root/nfs-share/Muri_exp/workloads/main_real_util.py --model0 dqn --batch-size0 128 --train-dir0 ./ --num-workers0 0 --prefetch-factor0 2 --iters0 65 --job-id0 18 --model1 0 --batch-size1 0 --train-dir1 /root/nfs-share/Muri_exp/workloads/datasets/imagenet --num-workers1 0 --prefetch-factor1 2 --iters1 0 --job-id1 -1 --model2 0 --batch-size2 0 --train-dir2 /root/nfs-share/Muri_exp/workloads/datasets/imagenet --num-workers2 0 --prefetch-factor2 2 --iters2 0 --job-id2 -1 --model3 0 --batch-size3 0 --train-dir3 /root/nfs-share/Muri_exp/workloads/datasets/imagenet --num-workers3 0 --prefetch-factor3 2 --iters3 0 --job-id3 -1 --this-dir /root/nfs-share/Muri_exp/workloads --scheduler-ip 192.168.1.104 --trainer-port 9022 --this-dir /root/nfs-share/Muri_exp/workloads
+
+
+
+
+/root/anaconda3/envs/muri/lib/python3.8/site-packages/horovod/common/util.py:258: UserWarning: Framework pytorch installed with version 1.9.1+cu102 but found version 1.9.1+cu111.
+             This can result in unexpected behavior including runtime errors.
+             Reinstall Horovod using `pip install --no-cache-dir` to build with the new version.
+  warnings.warn(get_version_mismatch_message(name, version, installed_version))
+trainer:INFO [2023-10-14 23:43:54,452] 192.168.1.104:9011
+trainer:INFO [2023-10-14 23:43:54,458] trainer, rpc, start, server @ 9022
+trainer:INFO [2023-10-14 23:43:54,460] job [18, -1, -1, -1], register, True
+trainer:INFO [2023-10-14 23:43:54,460] job [18, -1, -1, -1], trainer, start, 1697298234.4529603
+trainer:INFO [2023-10-14 23:43:57,165] trainer update_stats: 1, 0.2413771152496338
+2023-10-14 23:43:57.353526: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2023-10-14 23:43:57.380519: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2023-10-14 23:43:57.713999: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2023-10-14 23:43:58,034 - root - INFO: steps 237, episodic_return_train 3.0
+trainer:INFO [2023-10-14 23:43:58,425] trainer update_stats: 2, 1.2594764232635498
+2023-10-14 23:43:58,459 - root - INFO: steps 443, episodic_return_train 2.0
+trainer:INFO [2023-10-14 23:43:58,582] trainer update_stats: 3, 0.15729355812072754
+2023-10-14 23:43:58,611 - root - INFO: steps 633, episodic_return_train 2.0
+2023-10-14 23:43:58,692 - root - INFO: steps 744, episodic_return_train 0.0
+trainer:INFO [2023-10-14 23:43:58,748] trainer update_stats: 4, 0.16589617729187012
+2023-10-14 23:43:58,794 - root - INFO: steps 859, episodic_return_train 0.0
+trainer:INFO [2023-10-14 23:43:58,906] trainer update_stats: 5, 0.1578049659729004
+2023-10-14 23:43:58,978 - root - INFO: steps 1099, episodic_return_train 3.0
+trainer:INFO [2023-10-14 23:43:59,066] trainer update_stats: 6, 0.1598498821258545
+2023-10-14 23:43:59,079 - root - INFO: steps 1208, episodic_return_train 0.0
+2023-10-14 23:43:59,178 - root - INFO: steps 1351, episodic_return_train 1.0
+trainer:INFO [2023-10-14 23:43:59,230] trainer update_stats: 7, 0.16373586654663086
+2023-10-14 23:43:59,299 - root - INFO: steps 1492, episodic_return_train 1.0
+trainer:INFO [2023-10-14 23:43:59,388] trainer update_stats: 8, 0.15868902206420898
+2023-10-14 23:43:59,462 - root - INFO: steps 1701, episodic_return_train 2.0
+trainer:INFO [2023-10-14 23:43:59,548] trainer update_stats: 9, 0.15938544273376465
+2023-10-14 23:43:59,584 - root - INFO: steps 1842, episodic_return_train 1.0
+trainer:INFO [2023-10-14 23:43:59,706] trainer update_stats: 10, 0.15803074836730957
+2023-10-14 23:43:59,773 - root - INFO: steps 2089, episodic_return_train 4.0
+trainer:INFO [2023-10-14 23:43:59,866] trainer update_stats: 11, 0.16004085540771484
+2023-10-14 23:43:59,908 - root - INFO: steps 2250, episodic_return_train 1.0
+trainer:INFO [2023-10-14 23:44:00,028] trainer update_stats: 12, 0.16214919090270996
+2023-10-14 23:44:00,043 - root - INFO: steps 2408, episodic_return_train 1.0
+trainer:INFO [2023-10-14 23:44:00,188] trainer update_stats: 13, 0.15983176231384277
+2023-10-14 23:44:00,213 - root - INFO: steps 2626, episodic_return_train 3.0
+2023-10-14 23:44:00,293 - root - INFO: steps 2739, episodic_return_train 0.0
+trainer:INFO [2023-10-14 23:44:00,354] trainer update_stats: 14, 0.16590261459350586
+trainer:INFO [2023-10-14 23:44:00,506] trainer update_stats: 15, 0.15122032165527344
+2023-10-14 23:44:00,561 - root - INFO: steps 3072, episodic_return_train 5.0
+2023-10-14 23:44:00,642 - root - INFO: steps 3187, episodic_return_train 0.0
+trainer:INFO [2023-10-14 23:44:00,673] trainer update_stats: 16, 0.16693353652954102
+2023-10-14 23:44:00,784 - root - INFO: steps 3358, episodic_return_train 2.0
+trainer:INFO [2023-10-14 23:44:00,831] trainer update_stats: 17, 0.15819931030273438
+2023-10-14 23:44:00,886 - root - INFO: steps 3471, episodic_return_train 0.0
+trainer:INFO [2023-10-14 23:44:00,991] trainer update_stats: 18, 0.1601717472076416
+2023-10-14 23:44:01,036 - root - INFO: steps 3658, episodic_return_train 2.0
+trainer:INFO [2023-10-14 23:44:01,147] trainer update_stats: 19, 0.15590357780456543
+2023-10-14 23:44:01,216 - root - INFO: steps 3892, episodic_return_train 3.0
+trainer:INFO [2023-10-14 23:44:01,306] trainer update_stats: 20, 0.15885019302368164
+2023-10-14 23:44:01,346 - root - INFO: steps 4051, episodic_return_train 1.0
+2023-10-14 23:44:01,427 - root - INFO: steps 4164, episodic_return_train 0.0
+trainer:INFO [2023-10-14 23:44:01,469] trainer update_stats: 21, 0.16297674179077148
+2023-10-14 23:44:01,529 - root - INFO: steps 4279, episodic_return_train 0.0
+trainer:INFO [2023-10-14 23:44:01,627] trainer update_stats: 22, 0.15826725959777832
+2023-10-14 23:44:01,710 - root - INFO: steps 4515, episodic_return_train 3.0
+trainer:INFO [2023-10-14 23:44:01,785] trainer update_stats: 23, 0.15790104866027832
+2023-10-14 23:44:01,846 - root - INFO: steps 4676, episodic_return_train 1.0
+2023-10-14 23:44:01,928 - root - INFO: steps 4791, episodic_return_train 0.0
+trainer:INFO [2023-10-14 23:44:01,953] trainer update_stats: 24, 0.1672654151916504
+2023-10-14 23:44:02,032 - root - INFO: steps 4906, episodic_return_train 0.0
+trainer:INFO [2023-10-14 23:44:02,112] trainer update_stats: 25, 0.1596057415008545
+2023-10-14 23:44:02,151 - root - INFO: steps 5047, episodic_return_train 1.0
+2023-10-14 23:44:02,252 - root - INFO: steps 5188, episodic_return_train 1.0
+trainer:INFO [2023-10-14 23:44:02,277] trainer update_stats: 26, 0.16466832160949707
+2023-10-14 23:44:02,402 - root - INFO: steps 5379, episodic_return_train 2.0
+trainer:INFO [2023-10-14 23:44:02,435] trainer update_stats: 27, 0.15784883499145508
+trainer:INFO [2023-10-14 23:44:02,589] trainer update_stats: 28, 0.15332627296447754
+2023-10-14 23:44:02,686 - root - INFO: steps 5737, episodic_return_train 8.0
+trainer:INFO [2023-10-14 23:44:02,747] trainer update_stats: 29, 0.1579298973083496
+2023-10-14 23:44:02,818 - root - INFO: steps 5897, episodic_return_train 1.0
+trainer:INFO [2023-10-14 23:44:02,903] trainer update_stats: 30, 0.15584588050842285
+trainer:INFO [2023-10-14 23:44:03,054] trainer update_stats: 31, 0.1512894630432129
+2023-10-14 23:44:03,084 - root - INFO: steps 6232, episodic_return_train 5.0
+2023-10-14 23:44:03,185 - root - INFO: steps 6373, episodic_return_train 1.0
+trainer:INFO [2023-10-14 23:44:03,222] trainer update_stats: 32, 0.16770625114440918
+2023-10-14 23:44:03,287 - root - INFO: steps 6484, episodic_return_train 0.0
+trainer:INFO [2023-10-14 23:44:03,386] trainer update_stats: 33, 0.16390180587768555
+2023-10-14 23:44:03,460 - root - INFO: steps 6700, episodic_return_train 3.0
+trainer:INFO [2023-10-14 23:44:03,545] trainer update_stats: 34, 0.15934228897094727
+2023-10-14 23:44:03,561 - root - INFO: steps 6813, episodic_return_train 0.0
+trainer:INFO [2023-10-14 23:44:03,702] trainer update_stats: 35, 0.15633082389831543
+2023-10-14 23:44:03,807 - root - INFO: steps 7149, episodic_return_train 8.0
+trainer:INFO [2023-10-14 23:44:03,860] trainer update_stats: 36, 0.15790057182312012
+2023-10-14 23:44:03,908 - root - INFO: steps 7262, episodic_return_train 0.0
+trainer:INFO [2023-10-14 23:44:04,018] trainer update_stats: 37, 0.15837335586547852
+2023-10-14 23:44:04,060 - root - INFO: steps 7448, episodic_return_train 2.0
+2023-10-14 23:44:04,140 - root - INFO: steps 7563, episodic_return_train 0.0
+trainer:INFO [2023-10-14 23:44:04,184] trainer update_stats: 38, 0.16561508178710938
+trainer:INFO [2023-10-14 23:44:04,334] trainer update_stats: 39, 0.15023231506347656
+2023-10-14 23:44:04,424 - root - INFO: steps 7927, episodic_return_train 6.0
+trainer:INFO [2023-10-14 23:44:04,495] trainer update_stats: 40, 0.1609349250793457
+2023-10-14 23:44:04,529 - root - INFO: steps 8038, episodic_return_train 0.0
+2023-10-14 23:44:04,607 - root - INFO: steps 8147, episodic_return_train 0.0
+trainer:INFO [2023-10-14 23:44:04,663] trainer update_stats: 41, 0.16792631149291992
+2023-10-14 23:44:04,712 - root - INFO: steps 8262, episodic_return_train 0.0
+2023-10-14 23:44:04,796 - root - INFO: steps 8377, episodic_return_train 0.0
+trainer:INFO [2023-10-14 23:44:04,829] trainer update_stats: 42, 0.16619157791137695
+2023-10-14 23:44:04,900 - root - INFO: steps 8492, episodic_return_train 0.0
+trainer:INFO [2023-10-14 23:44:04,991] trainer update_stats: 43, 0.16114187240600586
+2023-10-14 23:44:05,000 - root - INFO: steps 8603, episodic_return_train 0.0
+2023-10-14 23:44:05,084 - root - INFO: steps 8718, episodic_return_train 0.0
+trainer:INFO [2023-10-14 23:44:05,157] trainer update_stats: 44, 0.16634297370910645
+2023-10-14 23:44:05,216 - root - INFO: steps 8877, episodic_return_train 1.0
+trainer:INFO [2023-10-14 23:44:05,318] trainer update_stats: 45, 0.16078782081604004
+2023-10-14 23:44:05,366 - root - INFO: steps 9063, episodic_return_train 2.0
+2023-10-14 23:44:05,447 - root - INFO: steps 9172, episodic_return_train 0.0
+trainer:INFO [2023-10-14 23:44:05,483] trainer update_stats: 46, 0.16484498977661133
+2023-10-14 23:44:05,567 - root - INFO: steps 9315, episodic_return_train 1.0
+trainer:INFO [2023-10-14 23:44:05,642] trainer update_stats: 47, 0.15881824493408203
+2023-10-14 23:44:05,734 - root - INFO: steps 9524, episodic_return_train 2.0
+trainer:INFO [2023-10-14 23:44:05,802] trainer update_stats: 48, 0.1602015495300293
+2023-10-14 23:44:05,896 - root - INFO: steps 9730, episodic_return_train 2.0
+trainer:INFO [2023-10-14 23:44:05,962] trainer update_stats: 49, 0.15941452980041504
+2023-10-14 23:44:05,996 - root - INFO: steps 9841, episodic_return_train 0.0
+trainer:INFO [2023-10-14 23:44:06,124] trainer update_stats: 50, 0.16225361824035645
+2023-10-14 23:44:06,201 - root - INFO: steps 10107, episodic_return_train 4.0
+trainer:INFO [2023-10-14 23:44:06,284] trainer update_stats: 51, 0.16017723083496094
+2023-10-14 23:44:06,304 - root - INFO: steps 10218, episodic_return_train 0.0
+2023-10-14 23:44:06,417 - root - INFO: steps 10377, episodic_return_train 1.0
+trainer:INFO [2023-10-14 23:44:06,449] trainer update_stats: 52, 0.16449880599975586
+trainer:INFO [2023-10-14 23:44:06,600] trainer update_stats: 53, 0.15147876739501953
+2023-10-14 23:44:06,635 - root - INFO: steps 10640, episodic_return_train 4.0
+2023-10-14 23:44:06,747 - root - INFO: steps 10797, episodic_return_train 1.0
+trainer:INFO [2023-10-14 23:44:06,769] trainer update_stats: 54, 0.16871118545532227
+2023-10-14 23:44:06,886 - root - INFO: steps 10953, episodic_return_train 1.0
+trainer:INFO [2023-10-14 23:44:06,945] trainer update_stats: 55, 0.17616724967956543
+trainer:INFO [2023-10-14 23:44:07,109] trainer update_stats: 56, 0.1632096767425537
+2023-10-14 23:44:07,153 - root - INFO: steps 11253, episodic_return_train 4.0
+trainer:INFO [2023-10-14 23:44:07,277] trainer update_stats: 57, 0.1678767204284668
+trainer:INFO [2023-10-14 23:44:07,435] trainer update_stats: 58, 0.15862298011779785
+2023-10-14 23:44:07,493 - root - INFO: steps 11674, episodic_return_train 7.0
+trainer:INFO [2023-10-14 23:44:07,603] trainer update_stats: 59, 0.16724586486816406
+2023-10-14 23:44:07,634 - root - INFO: steps 11833, episodic_return_train 1.0
+2023-10-14 23:44:07,740 - root - INFO: steps 11976, episodic_return_train 1.0
+trainer:INFO [2023-10-14 23:44:07,781] trainer update_stats: 60, 0.17839694023132324
+trainer:INFO [2023-10-14 23:44:07,947] trainer update_stats: 61, 0.1661701202392578
+2023-10-14 23:44:07,978 - root - INFO: steps 12233, episodic_return_train 3.0
+2023-10-14 23:44:08,089 - root - INFO: steps 12374, episodic_return_train 1.0
+trainer:INFO [2023-10-14 23:44:08,136] trainer update_stats: 62, 0.18859457969665527
+2023-10-14 23:44:08,241 - root - INFO: steps 12531, episodic_return_train 1.0
+trainer:INFO [2023-10-14 23:44:08,318] trainer update_stats: 63, 0.1821448802947998
+2023-10-14 23:44:08,416 - root - INFO: steps 12721, episodic_return_train 2.0
+trainer:INFO [2023-10-14 23:44:08,499] trainer update_stats: 64, 0.18041229248046875
+2023-10-14 23:44:08,535 - root - INFO: steps 12836, episodic_return_train 0.0
+trainer:INFO [2023-10-14 23:44:08,790] trainer update_stats: 65, 0.2911832332611084
+trainer:INFO [2023-10-14 23:44:08,793] job [18, -1, -1, -1] reported iteration time [0.16507780768654562] and resource utils [0, 18.293333333333333, 0.0]

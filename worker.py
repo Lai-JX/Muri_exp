@@ -92,7 +92,7 @@ class Worker(object):
     
 
     def _execute_impl(self, job_info) -> bool:
-        utils.print_ljx("worker execute!", "schedule ip:", self._master_ip)
+        # self._logger.info(f'{"ljx: worker execute!", "schedule ip:", self._master_ip}')
         success = True
         task = Task(job_info, self._master_ip, self._trace_name, self._this_dir)
         cmd = task.run()

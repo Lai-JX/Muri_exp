@@ -233,6 +233,7 @@ class _TFJobs(object):
 
         if 'submit_time' in job_dict:
             job_dict['r_submit_time'] = int(-1 * job_dict['submit_time'])
+            job_dict['submit_time'] -= 275400                               # ljx: 减少等待时间
         if 'antman' in FLAGS.schedule:
             if 'priority' not in job_dict:
                 job_dict['priority'] = random.randint(0,1)
@@ -553,8 +554,10 @@ class _TFJobs(object):
     def print_job_events(self):
         utils.print_fn('    Print all job events ')
         for event in self.job_events:
-            utils.print_fn('      event.time[%d], with %d start_jobs, and %d end_jobs' % 
-                            (event['time'], len(event['start_jobs']), len(event['end_jobs'])))
+            # utils.print_fn('      event.time[%d], with %d start_jobs, and %d end_jobs' % 
+                            # (event['time'], len(event['start_jobs']), len(event['end_jobs'])))
+            print('      event.time, with start_jobs, and end_jobs', 
+                            event['time'], event['start_jobs'], event['end_jobs'])
 
         utils.print_fn(' ')
 

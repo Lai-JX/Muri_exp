@@ -170,10 +170,10 @@ hostfile=$THIS_DIR/hostfiles/hostfile-[${JOB_ID0}-${JOB_ID1}-${JOB_ID2}-${JOB_ID
 echo $hostfile
 
 # set common command for mpirun
-COMMON_CMD="--allow-run-as-root --hostfile ${hostfile}" # ljx: 添加hostfile
+COMMON_CMD='--allow-run-as-root --hostfile ${hostfile} -bind-to none -map-by slot -mca plm_rsh_args "-p 6789" -x NCCL_DEBUG=INFO -x LD_LIBRARY_PATH -x PATH -mca pml ob1 -mca btl ^openib' # ljx: 添加hostfile
 
-if [ $NUM_GPU -ge 4 ]; then     # ljx 改为4，一台机器只有4个gpu
-    GPU_PERNODE=4
+if [ $NUM_GPU -ge 2 ]; then     # ljx 改为4，一台机器只有4个gpu
+    GPU_PERNODE=2
 else
     GPU_PERNODE=$NUM_GPU
 fi

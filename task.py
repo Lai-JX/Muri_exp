@@ -56,7 +56,9 @@ class Task(object):
         hostfile_dir = self._this_dir+'/workloads/hostfiles'
         assert os.path.exists(hostfile_dir)
         # hostfile_list = [f'worker-{node_id}\n' for node_id in self._node_id]    # ljx:需要改为从gpu1开始
-        hostfile_list = [f'gpu{node_id+1}\n' for node_id in self._node_id]    # ljx:需要改为从gpu1开始
+        hostfile_list = [f'gpu{node_id+1} slots=2 port=6789\n' for node_id in self._node_id]                        # ljx:需要改为从gpu1开始
+        hostfile_list = hostfile_list[0:-1]                                                                         # ljx:需要改为从gpu1开始
+        hostfile_list.append(f'gpu{len(self._node_id)} slots={self._num_gpu-(len(self._node_id)-1)*2} port=6789')   # ljx:需要改为从gpu1开始
         ch = '-'
         job_id_str = ch.join([str(x) for x in list(self._job_id)])
         job_counter_str = ch.join([str(x) for x in list(self._job_counter)])
