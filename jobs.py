@@ -233,7 +233,7 @@ class _TFJobs(object):
 
         if 'submit_time' in job_dict:
             job_dict['r_submit_time'] = int(-1 * job_dict['submit_time'])
-            job_dict['submit_time'] -= 275400                               # ljx: 减少等待时间
+            # job_dict['submit_time'] -= 275400                               # ljx: 减少等待时间
         if 'antman' in FLAGS.schedule:
             if 'priority' not in job_dict:
                 job_dict['priority'] = random.randint(0,1)
@@ -401,6 +401,13 @@ class _TFJobs(object):
         # tmp_dict['end_time'] = 15
         # print(tmp_dict)
         # self.job_list = tmp_list
+        
+        # ljx：缩放时间
+        max_submit_time = 0.0
+        for job in self.job_list:
+            max_submit_time = job['submit_time'] if job['submit_time'] > max_submit_time else max_submit_time
+        for job in self.job_list:
+            job['submit_time'] = job['submit_time'] / max_submit_time * 108000      # 将时间缩放到半小时内
 
         self.job_list.sort(key = lambda e:e.__getitem__('submit_time'))
         utils.print_fn('   Jobs are sorted with their start time')

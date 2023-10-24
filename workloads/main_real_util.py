@@ -297,6 +297,7 @@ if __name__ == '__main__':
     num_job = 0
     # time0 = time.time()
     if sargs0['iters']!=0:
+        # print(1)
         model0 = get_model(0, args, sargs0)
         model0.prepare(hvd)
         num_job += 1

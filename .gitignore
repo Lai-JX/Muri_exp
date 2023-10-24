@@ -1,7 +1,9 @@
 __pycache__
 results
 log
+job_logs
 tf_log
 workloads/*.out
 workloads/hostfiles/*
 workloads/*.txt
+workloads/datasets/*

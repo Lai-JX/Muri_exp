@@ -14,7 +14,7 @@ pull:
 push_all:
 	git add .; git commit -m update; git push -u origin master; git push -u gitee master;
 run:
-	rm ./workloads/*.txt; rm ./workloads/*.out; rm ./workloads/*.xml; rm ./workloads/hostfiles/hostfile-*; ./kill.sh; ./run.sh 192.168.1.104 9001 9013 1 dlas-gpu
+	./kill.sh; ./run.sh 192.168.1.104 9001 9013 1 dlas-gpu
 run1:
 	./kill.sh; ./run.sh 192.168.1.104 9001 9013 2 dlas-gpu
 reset:
@@ -22,3 +22,35 @@ reset:
 
 run_1:
 	rm ./workloads/*.txt; rm ./workloads/*.out; rm ./workloads/*.xml; rm ./workloads/hostfiles/hostfile-*; ./kill.sh; ./run.sh 192.168.1.107 9001 9013 1 dlas-gpu
+
+# rm ./workloads/*.txt; rm ./workloads/*.out; rm ./workloads/*.xml; rm ./workloads/hostfiles/hostfile-*; 
+
+# srtf
+srtf:
+	./kill.sh; ./run.sh 192.168.1.104 9001 9013 1 shortest
+srtf1:
+	./kill.sh; ./run.sh 192.168.1.104 9001 9013 2 shortest
+
+# srtf
+srsf:
+	./kill.sh; ./run.sh 192.168.1.104 9001 9013 1 shortest-gpu
+srsf1:
+	./kill.sh; ./run.sh 192.168.1.104 9001 9013 2 shortest-gpu
+
+# MuriS
+MuriS:
+	./kill.sh; ./run.sh 192.168.1.104 9001 9013 1 multi-resource-blossom-same-gpu
+MuriS1:
+	./kill.sh; ./run.sh 192.168.1.104 9001 9013 2 multi-resource-blossom-same-gpu
+
+# MuriL
+MuriL:
+	./kill.sh; ./run.sh 192.168.1.104 9001 9013 1 multi-resource-blossom-same-gpu-unaware
+MuriL1:
+	./kill.sh; ./run.sh 192.168.1.104 9001 9013 2 multi-resource-blossom-same-gpu-unaware
+	
+# Themis
+themis:
+	./kill.sh; ./run.sh 192.168.1.104 9001 9013 1 themis
+themis1:
+	./kill.sh; ./run.sh 192.168.1.104 9001 9013 2 themis1

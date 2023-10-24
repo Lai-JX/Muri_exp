@@ -6,6 +6,7 @@ import torch.utils.data.distributed
 # import torch.profiler
 # from torch.utils.tensorboard import SummaryWriter
 from torchvision import datasets, transforms, models
+import time         # ljx
 
 
 class CVModel:
@@ -19,7 +20,8 @@ class CVModel:
         prepare dataloader, model, optimizer for training
         '''
         self.device = torch.device("cuda")
-
+        # print(2)
+        time0 = time.time()
         train_dataset = \
             datasets.ImageFolder(self.sargs["train_dir"],
                             transform=transforms.Compose([
@@ -29,15 +31,18 @@ class CVModel:
                                 transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                                     std=[0.229, 0.224, 0.225])
                             ]))
+        # print(3)
+        # print("datasets.ImageFolder cost time:",time.time()-time0)        # ljx 大概需要380s
         # self.train_sampler是一个分布式采样器，用于在多个GPU上并行训练模型。它从train_dataset中抽取样本，并将其分配给不同的GPU （数据并行）
         self.train_sampler = torch.utils.data.distributed.DistributedSampler(
                 train_dataset, num_replicas=hvd.size(), rank=hvd.rank())
+        # print(4)
         self.train_loader = torch.utils.data.DataLoader(
             train_dataset, batch_size=self.sargs["batch_size"],
             sampler=self.train_sampler, num_workers=self.sargs["num_workers"],
             prefetch_factor=self.sargs["prefetch_factor"])  # prefetch_factor：预取数据的批量数
 
-
+        print(5)
         self.model = getattr(models, self.sargs["model_name"])(num_classes=self.args.num_classes)   # 获取预训练模型
 
         if self.args.cuda:

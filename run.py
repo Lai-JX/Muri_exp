@@ -120,7 +120,7 @@ def parse_job_file(trace_file):
     job_idx = 0
     for row in reader:
         #add job into JOBS,  JOBS = _TFJobs()
-        if (row['model_name'] == 'dqn' or row['model_name'] == 'a2c') and int(row['num_gpu']) <= 4:     # ljx
+        if (row['model_name'] != 'bert' and row['model_name'] != 'gpt2') and int(row['num_gpu']) <= 4:     # ljx
             JOBS.add_job(row)
             job_idx += 1
         # JOBS.read_job_info(job_idx, 'num_gpu')
@@ -634,7 +634,7 @@ def dlas_sim_jobs(scheduler, gputime=False, solve_starvation=0, place=False):
             
             demote_flag = False # have demote/promote or not
             tmp_time = scheduler.get_time()
-            print(tmp_time)
+            # print(tmp_time)
             assert tmp_time - last_check_time > FLAGS.schedule_interval or tmp_time < FLAGS.schedule_interval
             done_job_list = list()
             for rjob in JOBS.runnable_jobs:
