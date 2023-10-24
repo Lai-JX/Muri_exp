@@ -4,6 +4,7 @@ log
 job_logs
 tf_log
 workloads/*.out
+workloads/*.xml
 workloads/hostfiles/*
 workloads/*.txt
-workloads/datasets/*
+workloads/datasets
