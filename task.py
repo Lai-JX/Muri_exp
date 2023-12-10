@@ -24,7 +24,7 @@ class Task(object):
     
 
     def get_idle_port(self):
-        return 9013 + 8*min(self._node_id) + int(self._gpus.split(',')[0])
+        return 9013 + 2*min(self._node_id) + int(self._gpus.split(',')[0])      # ljx 每个节点只有两个2个gpu，所以这里先改为2
         # return utils.find_free_port()
 
 

@@ -118,11 +118,13 @@ def parse_job_file(trace_file):
     utils.print_fn('--------------------------------- Read TF jobs from: %s ---------------------------------' % trace_file) 
     utils.print_fn('    we get the following fields:\n        %s' % keys)
     job_idx = 0
-    for row in reader:
+    for row in reader: 
         #add job into JOBS,  JOBS = _TFJobs()
         if (row['model_name'] != 'bert' and row['model_name'] != 'gpt2') and int(row['num_gpu']) <= 4:     # ljx
             JOBS.add_job(row)
             job_idx += 1
+        if job_idx == 20:   # ljx:先只采用20个job
+            break
         # JOBS.read_job_info(job_idx, 'num_gpu')
         # job_idx += 1    
 
@@ -618,7 +620,7 @@ def dlas_sim_jobs(scheduler, gputime=False, solve_starvation=0, place=False):
                     # print(s_job['job_idx'], s_job['last_check_time'], scheduler.get_time())
                 new_flag = True
             
-            # 将状态为RUNNING且不在finished_jobs的job Kill，状态置为PENDING
+            # 将状态为RUNNING且不在finished_jobs的job(即timeout的job) Kill，状态置为PENDING
             for rjob in JOBS.runnable_jobs:
                 if 'RUNNING' == rjob['status']:                 
                     if running_jobs>0 and rjob['job_idx'] not in finished_jobs:     
@@ -638,7 +640,7 @@ def dlas_sim_jobs(scheduler, gputime=False, solve_starvation=0, place=False):
             assert tmp_time - last_check_time > FLAGS.schedule_interval or tmp_time < FLAGS.schedule_interval
             done_job_list = list()
             for rjob in JOBS.runnable_jobs:
-                if 'RUNNING' == rjob['status']:             # 这里对应的应该是returncode为0的作业，returncode为0仅代表job有进展，但不代表job已经完成了！
+                if 'RUNNING' == rjob['status']:                 # 这里对应的应该是returncode为0的作业，returncode为0仅代表job有进展，但不代表job已经完成了！
                     tmp = tmp_time - rjob['last_check_time']    # 距离job上一次被check过了多久
                     # finished_iter = scheduler.query_stats(rjob['job_idx'])
                     # print('request last_finish_time: ', rjob['job_idx'])

@@ -170,9 +170,9 @@ hostfile=$THIS_DIR/hostfiles/hostfile-[${JOB_ID0}-${JOB_ID1}-${JOB_ID2}-${JOB_ID
 
 # set common command for mpirun
 # COMMON_CMD="--hostfile ${hostfile}" # ljx: 添加hostfile  --allow-run-as-root --oversubscribe --prefix /root/share/openmpi
-COMMON_CMD="--allow-run-as-root --oversubscribe --prefix /root/share/openmpi -hostfile ${hostfile} -bind-to none -map-by slot -mca btl_tcp_if_include 192.168.1.104/24  -x LD_LIBRARY_PATH -x PATH -mca pml ob1 -mca btl ^openib" # ljx: 添加hostfile -x NCCL_DEBUG=INFO
+COMMON_CMD="--allow-run-as-root --oversubscribe --prefix /root/share/openmpi -hostfile ${hostfile} -bind-to none -map-by slot -mca btl_tcp_if_include 192.168.1.104/24  -x LD_LIBRARY_PATH -x PATH -x NCCL_DEBUG=INFO -x NCCL_SOCKET_IFNAME=enp -mca pml ob1 -mca btl ^openib" # ljx: 添加hostfile -x NCCL_DEBUG=INFO -mca oob_tcp_dynamic_ipv4_ports 9019-9025
 
-if [ $NUM_GPU -ge 2 ]; then         # ljx 改为4，一台机器只有4个gpu
+if [ $NUM_GPU -ge 2 ]; then         # ljx 改为4，一台机器只有4个gpu 
     GPU_PERNODE=2
 else
     GPU_PERNODE=$NUM_GPU

@@ -20,8 +20,8 @@ run1:
 reset:
 	git fetch; git reset --hard HEAD; git merge origin/master
 
-run_1:
-	rm ./workloads/*.txt; rm ./workloads/*.out; rm ./workloads/*.xml; rm ./workloads/hostfiles/hostfile-*; ./kill.sh; ./run.sh 192.168.1.107 9001 9013 1 dlas-gpu
+rm:
+	rm ./workloads/*.txt; rm ./workloads/*.out; rm ./workloads/*.xml; rm ./workloads/hostfiles/hostfile-*;
 
 # rm ./workloads/*.txt; rm ./workloads/*.out; rm ./workloads/*.xml; rm ./workloads/hostfiles/hostfile-*; 
 
@@ -53,4 +53,4 @@ MuriL1:
 themis:
 	./kill.sh; ./run.sh 192.168.1.104 9001 9013 1 themis
 themis1:
-	./kill.sh; ./run.sh 192.168.1.104 9001 9013 2 themis1
+	./kill.sh; ./run.sh 192.168.1.104 9001 9013 2 themis

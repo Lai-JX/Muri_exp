@@ -98,7 +98,19 @@ def find_free_port():
         s.bind(('', 0))
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         return s.getsockname()[1]
+    
+# 算差分
+def calDiff(data):
+    data_diff = []
+    for i in range(len(data)-1):
+        data_diff.append((data[i+1]-data[i])/60)
+    return data_diff
+
 
 if __name__ == '__main__':
     print(get_host_ip())
     print(print_ljx("hhh"))
+    print(parse_xml("../ljx.xml"))
+
+    data = [106095.7938488306, 106371.08212895904, 106502.54001553723, 106831.1847319827, 107226.71831424593, 107304.04648282133,107342.71056710904, 107570.4420235636, 107827.55818407684, 108000.0]
+    print(calDiff(data))

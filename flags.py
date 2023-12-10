@@ -25,7 +25,7 @@ class _FlagValues(object):
     self.__dict__['__parsed'] = True
     return unparsed
 
-  def __getattr__(self, name):
+  def __getattr__(self, name):      # 访问属性时会调用这个函数
     """Retrieves the 'value' attribute of the flag --name."""
     try:
       parsed = self.__dict__['__parsed']

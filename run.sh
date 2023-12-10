@@ -27,7 +27,7 @@ service ssh restart     # 防止系统抽风
 placement=('yarn')
 export schedules_all=$1
 shift
-jobs=('cluster_trace')
+jobs=('cluster_trace_20')
 setups=("n2g2")
 packing_nums=("4")
 schedule_intervals=("360")          # 6分钟（和论文中一致）ljx:这里先改为10s
@@ -62,8 +62,8 @@ for setup in ${setups[@]};do                                                    
                                 # python /home/jxlai/project/Muri_exp/run.py --cluster_spec=/home/jxlai/project/Muri_exp/cluster_specs/n4g4.csv --print --scheme=yarn --trace_file=/home/jxlai/project/Muri_exp/trace-data/cluster_trace.csv --schedule=dlas-gpu --log_path=/home/jxlai/project/Muri_exp/results/n4g4jcluster_tracep4si60ff60/dlas-gpu-yarn-4 --packing_num 4 --schedule_interval 60 --fast_forwarding 60
                                 sleep 10s
                             else
-                                sleep 6m    # ljx 
-                                # sleep 20s
+                                # sleep 6m    # ljx 
+                                sleep 20s
                             fi
 
                             # start worker for all nodes. 这里only one node?! → 根据WORKER_ID来指定
