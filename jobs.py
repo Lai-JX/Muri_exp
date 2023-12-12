@@ -407,7 +407,7 @@ class _TFJobs(object):
         for job in self.job_list:
             max_submit_time = job['submit_time'] if job['submit_time'] > max_submit_time else max_submit_time
         for job in self.job_list:
-            job['submit_time'] = job['submit_time'] / max_submit_time * 108000      # 将时间缩放到半小时内
+            job['submit_time'] = job['submit_time'] / max_submit_time * 1800      # 将时间缩放到半小时内
 
         self.job_list.sort(key = lambda e:e.__getitem__('submit_time'))
         utils.print_fn('   Jobs are sorted with their start time')
@@ -792,6 +792,7 @@ class _TFJobs(object):
         tmp_ejob可以是job list，也可以是一个job，通过is_packing来确定。
         通过代码可知，如果是job_list，则这些job利用的资源应该相同
         '''
+
         
         jobinfo = None
 
@@ -807,22 +808,22 @@ class _TFJobs(object):
         assert len(ejob[0]['placements'])==1    # 重新调度前job的placement会被清除，所以基本只会有一个placement
         placement = ejob[0]['placements'][0]
         job_id_list = [rjob['job_idx'] if rjob!=None else -1 for rjob in ejob]
-        job_name_list = [rjob['model_name'] if rjob!=None else '0' for rjob in ejob]
+        job_name_list = [rjob['model_name'] if rjob!=None else '-1' for rjob in ejob]    # ljx: 根据workloads/run.sh，这里 '0' 应该改为 '-1'(其实关系不大，因为batch_size为0，模型不会被运行)
         batch_size_list = [rjob['batch_size'] if rjob!=None else 0 for rjob in ejob]
         if FLAGS.fast_forwarding>0:
             iters_list0 = [rjob['remaining_iterations'] if rjob!=None else 0 for rjob in ejob]
             iters_sorted = sorted(list(set(iters_list0)))
             tmp_iter = 5
-            # print(iters_list0, iters_sorted)
             iters_list = [0,0,0,0]
             num_jobs = sum([1 if rjob!=None else 0 for rjob in ejob])
             for iters in iters_sorted:
                 if iters==0:
                     continue
                 tmp_iter += int(FLAGS.fast_forwarding/num_jobs)
+                # tmp_iter += int(60/num_jobs)
                 for idx, iter0 in enumerate(iters_list0):
                     if iter0 == iters:
-                        iters_list[idx] = tmp_iter      # 若iters_list0=[3,2,5]，则iters_list=[65,35,95]
+                        iters_list[idx] = tmp_iter      # 若iters_list0=[7447,7500,0,0]，则iters_list=[35,65,0,0](两个job)
             last_iters = list(set(iters_list))
             last_iters.sort()
             # print('jobs, to_info:', last_iters)
@@ -853,7 +854,7 @@ class _TFJobs(object):
         jobinfo.batch_size.extend(batch_size_list)
         jobinfo.iterations.extend(iters_list)
         jobinfo.job_counter.extend(job_counter_list)
-        
+        # exit(0)
         return jobinfo
 
     def calc_packing_finished_info(self, rjob, tmp_time, last_check_time):
@@ -916,3 +917,6 @@ JOBS = _TFJobs()
 _allowed_symbols = [
     'JOBS'
 ]
+
+# tmp_job = {'job_id': 35, 'num_gpu': 1, 'submit_time': 5803.37621700266, 'iterations': 7447, 'model_name': 'shufflenet_v2_x1_0', 'batch_size': 128, 'duration': 5794.0, 'interval': 535000, 'iteration_time': 0.798, 'resource_time_0': '706', 'resource_time_1': '59', 'resource_time_2': '0', 'priority': 0, 'resource_time': [706.0, 59.0, 0.0], 'rank': 9223372036854775807, 'tput': 1.2531328320802004, 'start_time': 6120.00066113472, 'end_time': 0, 'pending_time': 316.6244441320596, 'r_submit_time': -107845, 'packing_used': 0, 'execution_time': 0, 'last_start_time': 0, 'last_check_time': 6120.00066113472, 'executed_time': 0, 'remaining_iterations': 7447, 'preempt': 0, 'resume': 0, 'promote': 0, 'job_counter': 1, 'packing': None, 'status': 'PENDING', 'job_idx': 0, 'gpus': [], 'placements': [{'switch': 0, 'nodes': [{'id': 0, 'num_gpu': 1, 'num_cpu': 2, 'mem': 5, 'tasks': [], 'network': 0, 'gpu_list': [0]}]}], 'ps_placements': [], 'w_placements': [], 'remaining_gpu': 1, 'last_node_id': None, 'model_scale': 1, 'model': {'name': 'inception3', 'ind': 8, 'tensors': [3.8, 2.1, 1.3, 1.6, 1.9, 1.7, 1.7, 2.2, 5.9, 1.7, 1.7, 2.5, 3.0, 1.7, 1.7, 3.5, 5.9, 1.7, 1.7, 1.5, 7.8], 'mem_util': 1, 'total_size': 56.6}, 'ps_network': [], 'w_network': [0], 'ps_ave': 0, 'total_executed_time': 0, 'total_executed_gputime': 0, 'calc_executed_time': 0, 'last_pending_time': 0, 'q_id': 0, 'remaining_time': 5942.706, 'remaining_gputime': 5942.706}
+# JOBS.to_jobinfo(tmp_job)

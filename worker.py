@@ -13,10 +13,10 @@ from task import Task
 
 
 class Worker(object):
-    def __init__(self, master_ip, master_port, worker_ip, worker_port, gpus: str, trace_name, this_dir) -> None:
+    def __init__(self, master_ip, master_port, worker_ip, worker_port, gpus: str, trace_name, this_dir, log_path) -> None:
         super().__init__()
 
-        self._logger = utils.make_logger(__name__)
+        self._logger = utils.make_logger(__name__, log_path)
         
         self._master_ip = master_ip
         self._master_port = master_port
@@ -208,9 +208,10 @@ if __name__ == '__main__':
     parser.add_argument('--gpus', type=str, default='0,1,2,3,4,5,6,7')
     parser.add_argument('--trace_name', type=str, default='test')
     parser.add_argument('--this-dir', type=str, default='./')
+    parser.add_argument('--log_path',type=str, default='./my_log.log')  # ljx
 
     args = parser.parse_args()
 
     worker_ip = utils.get_host_ip()
-    worker = Worker(args.master_ip, args.master_port, worker_ip, args.worker_port, args.gpus, args.trace_name, args.this_dir)
+    worker = Worker(args.master_ip, args.master_port, worker_ip, args.worker_port, args.gpus, args.trace_name, args.this_dir, args.log_path)   # ljx
     worker.check_tasks()

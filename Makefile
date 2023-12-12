@@ -14,7 +14,7 @@ pull:
 push_all:
 	git add .; git commit -m update; git push -u origin master; git push -u gitee master;
 run:
-	./kill.sh; ./run.sh 192.168.1.104 9001 9013 1 dlas-gpu
+	rm ./workloads/*.xml; ./kill.sh; ./run.sh 192.168.1.104 9001 9013 1 dlas-gpu
 run1:
 	./kill.sh; ./run.sh 192.168.1.104 9001 9013 2 dlas-gpu
 reset:
@@ -54,3 +54,9 @@ themis:
 	./kill.sh; ./run.sh 192.168.1.104 9001 9013 1 themis
 themis1:
 	./kill.sh; ./run.sh 192.168.1.104 9001 9013 2 themis
+
+# mps
+mps:
+	./kill.sh; ./run.sh 192.168.1.104 9001 9013 1 mps
+mps1:
+	./kill.sh; ./run.sh 192.168.1.104 9001 9013 2 mps

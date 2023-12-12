@@ -98,8 +98,10 @@ class Task(object):
 
     @property
     def log_path(self):
-        if not os.path.exists(f'{self._trace_name}/'):
-            os.makedirs(f'{self._trace_name}/')
+        # print('self._trace_name:',self._trace_name,os.path.exists(f'{self._trace_name}/'))
+        # if not os.path.exists(f'{self._trace_name}/'):
+        #     print(not os.path.exists(f'{self._trace_name}/'))
+        #     os.makedirs(f'{self._trace_name}/')
         path = ''
         for i in range(self._job_num):
             if i==0:

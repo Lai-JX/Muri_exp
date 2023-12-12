@@ -3,16 +3,17 @@ import time
 import threading
 import utils
 import queue
+import flags
 
 from runtime.rpc import master_server, master_client
 import log
-
+FLAGS = flags.FLAGS
 
 class Controller(object):
     def __init__(self, port: int, num_workers: int) -> None:
         super().__init__()
         print("ljx: Controller init!\n")
-        self._logger = utils.make_logger(__name__)
+        self._logger = utils.make_logger(__name__, FLAGS.log_path)
 
         self._num_workers = num_workers
         self._workers = []

@@ -7,13 +7,14 @@ import threading
 import utils
 import copy
 from jobs import JOBS
-
+import flags
+FLAGS = flags.FLAGS
 
 class Scheduler(object):
     def __init__(self, scheduler_port: int, controller_port: int) -> None:
         super().__init__()
 
-        self._logger = utils.make_logger(__name__)
+        self._logger = utils.make_logger(__name__, FLAGS.log_path)
 
         self._trainers = dict()                                                     # 根据job_id存对应的client（to trainer）
         self._server_for_trainer = self.make_server_for_trainer(scheduler_port)     # Scheduler._server_for_worker 运行scheduler_server.server

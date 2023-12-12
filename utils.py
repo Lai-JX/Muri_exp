@@ -13,15 +13,20 @@ import numpy as np
 
 FLAGS = flags.FLAGS
 
-def make_logger(name):
+def make_logger(name, path=None):
     LOG_FORMAT = '{name}:{levelname} [{asctime}] {message}'
 
     logger = logging.getLogger(name)
     logger.setLevel(logging.DEBUG)
     logger.propagate = False
-    ch = logging.StreamHandler()
-    ch.setFormatter(logging.Formatter(LOG_FORMAT, style='{'))
-    logger.addHandler(ch)
+    if not path:
+        ch = logging.StreamHandler()
+        ch.setFormatter(logging.Formatter(LOG_FORMAT, style='{'))
+        logger.addHandler(ch)
+    else:
+        fh = logging.FileHandler(path + '/my_log.log')
+        fh.setFormatter(logging.Formatter(LOG_FORMAT, style='{'))
+        logger.addHandler(fh)
 
     return logger
 
@@ -77,6 +82,7 @@ def search_dict_list(dict_list, key, value):
     return None
 
 def parse_xml(filename:str):
+    print('parse_xml:',filename)
     fb_memory_usage = []
     utilization = []
     file_content = open(filename, mode='r').read()

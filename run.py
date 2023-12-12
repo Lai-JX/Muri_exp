@@ -5,6 +5,7 @@ import sys
 import types
 import time
 import math
+import subprocess
 #parse args
 import argparse
 import copy
@@ -123,8 +124,8 @@ def parse_job_file(trace_file):
         if (row['model_name'] != 'bert' and row['model_name'] != 'gpt2') and int(row['num_gpu']) <= 4:     # ljx
             JOBS.add_job(row)
             job_idx += 1
-        if job_idx == 20:   # ljx:先只采用20个job
-            break
+        # if job_idx == 20:   # ljx:先只采用20个job
+        #     break
         # JOBS.read_job_info(job_idx, 'num_gpu')
         # job_idx += 1    
 
@@ -227,6 +228,26 @@ def cal_shortest_expected_remaining(job_data, a):
 
     num = job_data['num'] - 1 - idx 
     return round(sum(data[idx: (job_data['num'] - 1)]) * 1.0 / num, 2)
+
+def mps_sim_jobs(scheduler=None, gputime=False, place=False):
+
+    print('MPS!')
+    # 开启MPS
+    cmd = 'ps -ef | grep mps'
+    
+    # cmd = cmd.split()
+    print(cmd)
+    out = os.popen(cmd)
+    print(out.readlines())
+    # print(subprocess.Popen(cmd))
+    time.sleep(120)
+
+    # 关闭MPS
+    bash_cmd = 'echo quit | nvidia-cuda-mps-control; sudo nvidia-smi -i 0 -c DEFAULT'
+    cmd = bash_cmd.split()
+    subprocess.Popen(cmd)
+
+
 
 def shortest_first_sim_jobs(scheduler=None, gputime=False, place=False):
     '''
@@ -566,9 +587,10 @@ def dlas_sim_jobs(scheduler, gputime=False, solve_starvation=0, place=False):
     scheduler._controller.set_start_time()
     last_check_time = 0
     finished_job_cnt = 0
-    if FLAGS.fast_forwarding == 0:              # 在run.sh中默认为60，但目前不知道这个参数的作用
-        print('Not Implemented!')
-    else:
+    # if FLAGS.fast_forwarding == 0:              # 在run.sh中默认为60，但目前不知道这个参数的作用
+    #     print('Not Implemented!')
+    # else:
+    if True:
         est_check_time = 0
         running_jobs = 0
         print('dlas info: ', JOBS.num_queue, JOBS.queue_limit)              # JOBS.num_queue=3, JOBS.queue_limit=[3250, 7200, 18000]
@@ -577,12 +599,14 @@ def dlas_sim_jobs(scheduler, gputime=False, solve_starvation=0, place=False):
                 # print("waiting for trainers: ", scheduler.get_time(), running_jobs, scheduler.has_running_trainers(running_jobs), scheduler._trainers.keys())
                 time.sleep(5)
             # scheduler._logger.info(f'{"ljx:assert len(scheduler._trainers.keys())==running_jobs",len(scheduler._trainers.keys()), running_jobs}')
+            # print(scheduler.get_time())
             assert len(scheduler._trainers.keys())==running_jobs
             if running_jobs>0:
                 time.sleep(2)
             # assert scheduler.has_running_trainers(running_jobs)==False
-            tmp_jump_time = max(est_check_time - scheduler.get_time(), 0)
+            tmp_jump_time = max(est_check_time - scheduler.get_time(), 0)   # est_check_time表示当前实际时间
             scheduler._controller._jump_time += tmp_jump_time               # _jump_time的作用：同步这里与Controller中的时间，每隔FLAGS.schedule_interval调度一次
+            # print('tmp_jump_time:',tmp_jump_time)
             LOG.checkpoint_utils(last_check_time, scheduler)
 
             
@@ -591,13 +615,16 @@ def dlas_sim_jobs(scheduler, gputime=False, solve_starvation=0, place=False):
             done_flag = False
             finished_jobs = []
             while not scheduler._controller.done_queue.empty():
+                # print("done queue not empty")
                 finished_time, job_id, worker_id, gpus, returncode = scheduler._controller.done_queue.get()
                 e_job = JOBS.find_runnable_job(job_id)
                 finished_jobs.append(e_job['job_idx'])
                 # est_finished_time = finished_time + max(e_job['remaining_iterations']-FLAGS.fast_forwarding, 0)*e_job['real_itertime'][0]
                 if returncode==0:                                   # 完成
                     e_job['last_finish_time'] = finished_time
-                else:                                               # 出错
+                    # scheduler._logger.info(f'{e_job["job_idx"]}, done: {e_job["last_finish_time"]}')
+                else:  
+                    # scheduler._logger.info('returncode!=0')                                             # 出错
                     e_job['status'] = 'PENDING'
                     del e_job['placements'][:]
                     done_flag = True
@@ -611,12 +638,12 @@ def dlas_sim_jobs(scheduler, gputime=False, solve_starvation=0, place=False):
                 event = JOBS.job_events.pop(0)
                 assert 'start_jobs' in event
                 for s_job in event['start_jobs']:
-                    JOBS.move_to_runnable(s_job)        # 状态为pending
+                    JOBS.move_to_runnable(s_job)        # 状态为pending  job['last_check_time'] = job['submit_time']
                     s_job['q_id'] = 0
                     JOBS.queues[0].append(s_job)
                     s_job['remaining_time'] = s_job['iteration_time'] * s_job['remaining_iterations']
                     s_job['remaining_gputime'] = s_job['remaining_time'] * s_job['num_gpu']             # 既考虑时间也考虑空间
-                    utils.print_fn('---- job[%d] is added' % s_job['job_idx'])
+                    scheduler._logger.info(f'---- job[{s_job["job_idx"]}] is added')
                     # print(s_job['job_idx'], s_job['last_check_time'], scheduler.get_time())
                 new_flag = True
             
@@ -646,10 +673,13 @@ def dlas_sim_jobs(scheduler, gputime=False, solve_starvation=0, place=False):
                     # print('request last_finish_time: ', rjob['job_idx'])
                     tmp_error = (rjob['real_itertime'][0]-rjob['iteration_time'])/rjob['iteration_time']        # rjob['real_itertime'][0]由trainer汇报而来
                     JOBS.overhead_list[1].append(tmp_error)
-                    if rjob['last_finish_time']<last_check_time:               
+                    # scheduler._logger.info(f'{rjob["job_idx"]}, last_finish_time: {rjob["last_finish_time"]}, last_check_time:{last_check_time}, tmp: {tmp}') 
+                    if rjob['last_finish_time']<last_check_time:         # 判断上一次有没有调度     
                         finished_time = rjob['remaining_iterations'] * rjob['real_itertime'][0]                 # 上次任务完成后，距离任务完成还需要的时间
-                    else:                                                       
+                        # scheduler._logger.info(f'{rjob["job_idx"]}, first, finished_time: {finished_time}, remaining_iterations: {rjob["remaining_iterations"]}')
+                    else:                                                  
                         finished_time = rjob['last_finish_time']-rjob['last_check_time'] + max(rjob['remaining_iterations']-FLAGS.fast_forwarding, 0)*rjob['real_itertime'][0]
+                        # scheduler._logger.info(f'{rjob["job_idx"]}, second, finished_time: {finished_time}, remaining_iterations: {rjob["remaining_iterations"]}')     
                     if finished_time<=tmp:                  # job已完成
                         rjob['total_executed_time'] += finished_time
                         rjob['last_check_time'] += finished_time
@@ -666,8 +696,10 @@ def dlas_sim_jobs(scheduler, gputime=False, solve_starvation=0, place=False):
                         rjob['executed_time'] += tmp
                         if rjob['last_finish_time']<last_check_time:
                             finished_iter = int((tmp_time - last_check_time)/rjob['real_itertime'][0])
+                            # scheduler._logger.info(f'{rjob["job_idx"]}, first, {finished_iter}')
                         else:
                             finished_iter = int(FLAGS.fast_forwarding + (tmp_time-rjob['last_finish_time'])/rjob['real_itertime'][0])
+                            # scheduler._logger.info(f'{rjob["job_idx"]}, second, {finished_iter}')
                         rjob['remaining_iterations'] -= finished_iter
                         # print(rjob['job_idx'], rjob['remaining_iterations'], finished_iter)
                         # rjob['remaining_time'] = rjob['iteration_time'] * rjob['remaining_iterations']
@@ -731,7 +763,7 @@ def dlas_sim_jobs(scheduler, gputime=False, solve_starvation=0, place=False):
                 assert len(JOBS.runnable_jobs) == sum([len(queue) for queue in JOBS.queues])
                 run_jobs = list()
                 preempt_jobs = list()
-                #scan / execute jobs one by one
+                # scan / execute jobs one by one
                 if place ==True:
                     CLUSTER.empty_infra()
                     tmp_runnable_jobs = list()
@@ -1757,6 +1789,8 @@ def main():
         multi_resource_blossom_same_sim_jobs(scheduler, True, know_duration=False, blossom=False)
     elif FLAGS.schedule == 'themis':
         themis_sim_jobs(scheduler, )
+    elif FLAGS.schedule == 'mps':                                                           # mps
+        mps_sim_jobs(scheduler)
     else:
         print('not support scheduler') 
 
@@ -1764,4 +1798,6 @@ def main():
 
 if __name__ == '__main__':
     # print('Hello world %d' % 2)
+    # mps_sim_jobs()
     main()
+    
