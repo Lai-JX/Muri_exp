@@ -15,6 +15,7 @@ FLAGS = flags.FLAGS
 
 def make_logger(name, path=None):
     LOG_FORMAT = '{name}:{levelname} [{asctime}] {message}'
+    print('path:',path)
 
     logger = logging.getLogger(name)
     logger.setLevel(logging.DEBUG)
@@ -24,7 +25,7 @@ def make_logger(name, path=None):
         ch.setFormatter(logging.Formatter(LOG_FORMAT, style='{'))
         logger.addHandler(ch)
     else:
-        fh = logging.FileHandler(path + '/my_log.log')
+        fh = logging.FileHandler(path)
         fh.setFormatter(logging.Formatter(LOG_FORMAT, style='{'))
         logger.addHandler(fh)
 
@@ -91,7 +92,7 @@ def parse_xml(filename:str):
         root = ET.fromstring(xmls[i] + '</nvidia_smi_log>\n')
         for child in root[4]:
             if child.tag == 'fb_memory_usage':
-                fb_memory_usage.append(child[1].text)
+                fb_memory_usage.append(child[2].text)   # ljx
             if child.tag == "utilization":
                 utilization.append(child[0].text)
     return fb_memory_usage, utilization

@@ -27,13 +27,13 @@ rm:
 
 # srtf
 srtf:
-	./kill.sh; ./run.sh 192.168.1.104 9001 9013 1 shortest
+	rm ./workloads/*.txt; rm ./workloads/*.out; rm ./workloads/*.xml; rm ./workloads/hostfiles/hostfile-*; ./kill.sh; ./run.sh 192.168.1.104 9001 9013 1 shortest
 srtf1:
 	./kill.sh; ./run.sh 192.168.1.104 9001 9013 2 shortest
 
-# srtf
+# srsf
 srsf:
-	./kill.sh; ./run.sh 192.168.1.104 9001 9013 1 shortest-gpu
+	rm ./workloads/*.txt; rm ./workloads/*.out; rm ./workloads/*.xml; rm ./workloads/hostfiles/hostfile-*; ./kill.sh; ./run.sh 192.168.1.104 9001 9013 1 shortest-gpu
 srsf1:
 	./kill.sh; ./run.sh 192.168.1.104 9001 9013 2 shortest-gpu
 

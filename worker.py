@@ -16,7 +16,7 @@ class Worker(object):
     def __init__(self, master_ip, master_port, worker_ip, worker_port, gpus: str, trace_name, this_dir, log_path) -> None:
         super().__init__()
 
-        self._logger = utils.make_logger(__name__, log_path)
+        self._logger = utils.make_logger(__name__, log_path+'/worker.log')
         
         self._master_ip = master_ip
         self._master_port = master_port
@@ -171,6 +171,7 @@ class Worker(object):
             sorted_memory_usages = sorted(memory_usage)
             gpu_util_device = 0
             gpu_util_cnt = 0
+            print(memory_usage, sorted_memory_usages)
             for i in range(len(memory_usage)):
                 if math.isclose(memory_usage[i], sorted_memory_usages[-2], rel_tol=1e-1):
                     gpu_util_device += utilization[i]
@@ -205,7 +206,7 @@ if __name__ == '__main__':
     parser.add_argument('--master_ip', type=str, required=True)
     parser.add_argument('--master_port', type=int, default=9012)
     parser.add_argument('--worker_port', type=int, default=9001)
-    parser.add_argument('--gpus', type=str, default='0,1,2,3,4,5,6,7')
+    parser.add_argument('--gpus', type=str, default='0,1,2,3,4,5,6,7')  # ljx 4049上只有两个gpu，记得更改
     parser.add_argument('--trace_name', type=str, default='test')
     parser.add_argument('--this-dir', type=str, default='./')
     parser.add_argument('--log_path',type=str, default='./my_log.log')  # ljx

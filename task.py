@@ -55,10 +55,12 @@ class Task(object):
 
         hostfile_dir = self._this_dir+'/workloads/hostfiles'
         assert os.path.exists(hostfile_dir)
-        # hostfile_list = [f'worker-{node_id}\n' for node_id in self._node_id]    # ljx:需要改为从gpu1开始
-        hostfile_list = [f'gpu{(node_id+1)} slots=2 port=6789\n' for node_id in self._node_id]                        # ljx:需要改为从gpu1开始,若以gpu1为server，记得去掉^3
-        hostfile_list = hostfile_list[0:-1]                                                                             # ljx:需要改为从gpu1开始
-        hostfile_list.append(f'gpu{(len(self._node_id))} slots={self._num_gpu-(len(self._node_id)-1)*2} port=6789')   # ljx:需要改为从gpu1开始,若以gpu1为server，记得去掉^3
+        # hostfile_list = [f'worker-{node_id}\n' for node_id in self._node_id]    # ljx:需要改为从gpu1开始  
+        hostfile_list = [f'gpu{(node_id+1)^3} slots=2 port=6789\n' for node_id in self._node_id]                            # ^3 优先调度gpu2的gpu
+        if 2*len(self._node_id) != self._num_gpu:
+            hostfile_list = hostfile_list[0:-1]                                                                             # ljx:需要改为从gpu1开始
+            hostfile_list.append(f'gpu{(self._node_id[-1]+1)^3} slots={self._num_gpu-(len(self._node_id)-1)*2} port=6789')  # ^3 优先调度gpu2的gpu
+
         ch = '-'
         job_id_str = ch.join([str(x) for x in list(self._job_id)])
         job_counter_str = ch.join([str(x) for x in list(self._job_counter)])
@@ -67,8 +69,10 @@ class Task(object):
             f.writelines(hostfile_list)
         utils.print_ljx("task.run:hostfile_list:", hostfile_list)
         utils.print_ljx("log path after here:",self.log_path, '\n')
+        utils.print_ljx('environ_dict["CUDA_VISIBLE_DEVICES"]',self._gpus)
         environ_dict = dict(os.environ)
         environ_dict['CUDA_VISIBLE_DEVICES'] = self._gpus
+        print(environ_dict)
         with open(self.log_path, 'w+') as f:
             self._handler = subprocess.Popen(
                 cmd, 

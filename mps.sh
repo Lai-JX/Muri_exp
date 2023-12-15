@@ -16,7 +16,7 @@ do
                 exit
                 ;;
              q)
-                echo quit | nvidia-cuda-mps-control
+                echo quit | sudo nvidia-cuda-mps-control
                 sudo nvidia-smi -c DEFAULT
                 ;;
              ?)  #当有不认识的选项的时候arg为?

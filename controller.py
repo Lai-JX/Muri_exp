@@ -13,7 +13,7 @@ class Controller(object):
     def __init__(self, port: int, num_workers: int) -> None:
         super().__init__()
         print("ljx: Controller init!\n")
-        self._logger = utils.make_logger(__name__, FLAGS.log_path)
+        self._logger = utils.make_logger(__name__, FLAGS.log_path+'/master.log')
 
         self._num_workers = num_workers
         self._workers = []
@@ -50,7 +50,7 @@ class Controller(object):
     
 
     def execute(self, job_info):
-        self._logger.info(f'controller execute job {list(job_info.job_id)}, use node: {list(job_info.node_id)}')
+        self._logger.info(f'controller execute job {list(job_info.job_id)}, use node: {list(job_info.node_id)}, gpu_num: {job_info.num_gpu}')
         self._workers[min(list(job_info.node_id))].execute(job_info)        # 这里按理说应该向所有node_id对应的worker发送execute命令 → 不用，交给hovorod和mpi去管
     
 

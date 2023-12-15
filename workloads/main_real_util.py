@@ -103,15 +103,18 @@ def train():
 
         # start subprocess
         # gpu
+        cur_pid = os.getpid()
         visible_device_str = os.getenv('CUDA_VISIBLE_DEVICES')
+        print(os.environ.keys())
+        print('visible_device_str:',visible_device_str)
         if visible_device_str!=None:
             split_ch = ','
             visible_devices = visible_device_str.split(split_ch)
-            filename = args.this_dir+"/profiling"+ visible_devices[hvd.local_rank()] +".xml"
+            filename = args.this_dir+"/profiling"+ visible_devices[hvd.local_rank()] + '-' + str(cur_pid) +".xml"
             command = "exec nvidia-smi -q -i " + visible_devices[hvd.local_rank()] + " -x -l 1 -f " + filename
             gpu_process=subprocess.Popen(command, shell=True)
         # cpu
-        cur_pid = os.getpid()
+        # cur_pid = os.getpid()
         cpu_command = "exec top -d 0.2 -bn " + str(secs) + " -p "+ str(cur_pid) +" | grep Cpu > "+ args.this_dir + "/profiling_cpu_"+str(cur_pid) +".out"
         cpu_process = subprocess.Popen(cpu_command, shell=True)
 
@@ -126,7 +129,7 @@ def train():
         # data 0        
         if cur_iter<sargs0['iters']:
             thread0 = myThread(0)
-            thread0.start()     # 获取数据，最终调用模型的get_data方法(改方法除了获取数据，也会输出日志，如：2023-09-12 15:41:27,563 - root - INFO: steps 981, episodic_return_train 0.0)
+            thread0.start()     # 获取数据，最终调用模型的get_data方法(该方法除了获取数据，也会输出日志，如：2023-09-12 15:41:27,563 - root - INFO: steps 981, episodic_return_train 0.0)
 
         if cur_iter>0:
             # fp/bp 2
@@ -224,8 +227,9 @@ def train():
             gpu_process.send_signal(signal.SIGINT)
             gpu_process.terminate()
             gpu_process.wait()
-
-            filename = args.this_dir + "/profiling" + visible_devices[hvd.local_rank()] + ".xml"
+            # time.sleep(2)           # ljx
+            # filename = args.this_dir + "/profiling" + visible_devices[hvd.local_rank()] + ".xml"
+            filename = args.this_dir+"/profiling"+ visible_devices[hvd.local_rank()] + '-' + str(cur_pid) +".xml"
             memory_usage, utilization = utils.parse_xml(filename)
             for i in range(len(memory_usage)):
                 memory_usage[i] = int(memory_usage[i].split(' ')[0])

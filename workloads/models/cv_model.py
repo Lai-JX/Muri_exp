@@ -42,7 +42,7 @@ class CVModel:
             sampler=self.train_sampler, num_workers=self.sargs["num_workers"],
             prefetch_factor=self.sargs["prefetch_factor"])  # prefetch_factor：预取数据的批量数
 
-        print(5)
+        # print(5)
         self.model = getattr(models, self.sargs["model_name"])(num_classes=self.args.num_classes)   # 获取预训练模型
 
         if self.args.cuda:
