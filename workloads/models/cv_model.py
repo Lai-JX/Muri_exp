@@ -44,6 +44,9 @@ class CVModel:
 
         # print(5)
         self.model = getattr(models, self.sargs["model_name"])(num_classes=self.args.num_classes)   # 获取预训练模型
+        if self.sargs["resume"]:
+            filename = f'{self.args.model_path}/{self.sargs["job_id"]}-{self.sargs["model_name"]}'
+            self.load(filename)
 
         if self.args.cuda:
             self.model.cuda()
@@ -112,3 +115,10 @@ class CVModel:
     def data_size(self):
         # each image is 108.6kb on average
         return self.sargs["batch_size"] * 108.6
+    
+    def save(self, filename):
+        torch.save(self.model.state_dict(), '%s.model' % (filename))
+
+    def load(self, filename):
+        state_dict = torch.load('%s.model' % filename, map_location=lambda storage, loc: storage)
+        self.model.load_state_dict(state_dict)

@@ -98,6 +98,7 @@ JOBS = jobs.JOBS
 
 #get host info
 CLUSTER = cluster.CLUSTER
+CLUSTER_TMP = cluster.CLUSTER_TMP
 
 #get LOG object
 LOG = log.LOG
@@ -183,6 +184,7 @@ def parse_cluster_spec():
 
     '''init infra'''
     CLUSTER.init_infra()
+    CLUSTER_TMP.init_infra()
     # utils.print_fn(lp.prepare_cluster_info())
     utils.print_fn('--------------------------------- End of cluster spec ---------------------------------')
     return 
@@ -191,29 +193,29 @@ def parse_cluster_spec():
 '''
 Allocate job resource
 '''
-def try_get_job_res(job, not_place=False):
+def try_get_job_res(job, not_place=False, alloc_flag=True):
     '''
     select placement scheme
     '''
     if 'antman' in FLAGS.schedule:
-        ret = CLUSTER.antman_placement(job)
+        ret = CLUSTER.antman_placement(job) if alloc_flag else CLUSTER_TMP.antman_placement(job)
     elif FLAGS.scheme == 'yarn':
-        ret = CLUSTER.ms_yarn_placement(job, not_place)
+        ret = CLUSTER.ms_yarn_placement(job, not_place) if alloc_flag else CLUSTER_TMP.ms_yarn_placement(job, not_place=True)
     elif FLAGS.scheme == 'balance':
         ret = lp.placement(job)
         # ret = lp.min_new_job(job)
     elif FLAGS.scheme == 'random':
-        ret = CLUSTER.random_placement(job)
+        ret = CLUSTER.random_placement(job) if alloc_flag else CLUSTER_TMP.random_placement(job)
     elif FLAGS.scheme == 'crandom':
-        ret = CLUSTER.consolidate_random_placement(job)
+        ret = CLUSTER.consolidate_random_placement(job) if alloc_flag else CLUSTER_TMP.consolidate_random_placement(job)
     elif FLAGS.scheme == 'greedy':
-        ret = CLUSTER.greedy_placement(job)
+        ret = CLUSTER.greedy_placement(job) if alloc_flag else CLUSTER_TMP.greedy_placement(job)
     elif FLAGS.scheme == 'gandiva':
-        ret = CLUSTER.gandiva_placement(job)
+        ret = CLUSTER.gandiva_placement(job) if alloc_flag else CLUSTER_TMP.gandiva_placement(job)
     elif FLAGS.scheme == 'count':
-        ret = CLUSTER.none_placement(job)
+        ret = CLUSTER.none_placement(job) if alloc_flag else CLUSTER_TMP.none_placement(job)
     else:
-        ret = CLUSTER.ms_yarn_placement(job)
+        ret = CLUSTER.ms_yarn_placement(job) if alloc_flag else CLUSTER_TMP.ms_yarn_placement(job)
     if ret == True:
         # job['status'] = 'RUNNING'
         pass
@@ -239,7 +241,8 @@ def mps_sim_jobs(scheduler=None, gputime=False, place=False):
         while (len(JOBS.job_events) + len(JOBS.runnable_jobs))> 0:
             done_flag = False
             new_flag = False
-            # print('before: ', scheduler.get_time())
+            scheduler._logger.info(f'\n\nbefore: {scheduler.get_time()}')
+            # scheduler._logger.info(f'{JOBS.job_events}\n{JOBS.runnable_jobs}')
             while not scheduler._controller.done_queue.empty():
                 finished_time, job_id, worker_id, gpus, returncode = scheduler._controller.done_queue.get()
                 e_job = JOBS.find_runnable_job(job_id)
@@ -251,6 +254,7 @@ def mps_sim_jobs(scheduler=None, gputime=False, place=False):
                     scheduler._trainers.pop(e_job['job_idx'])
                     LOG.job_complete(e_job, finished_time)
                     finished_job_cnt += 1
+                    scheduler._logger.info(f'**** job[{e_job["job_idx"]}] completed')
                     scheduler._logger.info(f'scheduler finishes {finished_job_cnt} jobs in all!')
                     JOBS.runnable_jobs.remove(e_job)
                 else:
@@ -266,7 +270,7 @@ def mps_sim_jobs(scheduler=None, gputime=False, place=False):
                     JOBS.move_to_runnable(s_job)
                     s_job['remaining_time'] = s_job['iteration_time'] * s_job['remaining_iterations']
                     s_job['remaining_gputime'] = s_job['remaining_time'] * s_job['num_gpu']
-                    utils.print_fn('---- job[%d] is added' % s_job['job_idx'])
+                    scheduler._logger.info(f'---- job[{s_job["job_idx"]}] is added')
                 new_flag = True
             
             tmp_time = scheduler.get_time()
@@ -274,6 +278,7 @@ def mps_sim_jobs(scheduler=None, gputime=False, place=False):
                 assert tmp_time - last_check_time > FLAGS.schedule_interval or tmp_time < FLAGS.schedule_interval
                 for rjob in JOBS.runnable_jobs:
                     if 'RUNNING' == rjob['status']:
+                        # pass    # 如果是抢占式，这里需要查询并更新job迭代次数
                         tmp = tmp_time - rjob['last_check_time']
                         rjob['total_executed_time'] = rjob['total_executed_time'] + tmp
                         rjob['last_check_time'] = tmp_time
@@ -283,15 +288,15 @@ def mps_sim_jobs(scheduler=None, gputime=False, place=False):
                         rjob['remaining_time'] = rjob['iteration_time'] * rjob['remaining_iterations']
                         if gputime:
                             rjob['remaining_gputime'] = rjob['remaining_time'] * rjob['num_gpu']
-                        print(tmp_time, 'check: running ', rjob['job_idx'], rjob['remaining_iterations'], rjob['total_executed_time'])
+                        scheduler._logger.info(f'{tmp_time} check: running  {rjob["job_idx"]} {rjob["remaining_iterations"]} {rjob["total_executed_time"]}')  
                     elif 'PENDING' == rjob['status']:
                         tmp = tmp_time - rjob['last_check_time']
                         rjob['pending_time'] += tmp
                         rjob['last_check_time'] = tmp_time
-                        print(tmp_time, 'check: pending ', rjob['job_idx'], rjob['remaining_iterations'], rjob['pending_time'])
+                        scheduler._logger.info(f'{tmp_time} check: pending  {rjob["job_idx"]} {rjob["remaining_iterations"]} {rjob["pending_time"]}')
                     elif 'END' == rjob['status']: #almost impossible
                         JOBS.runnable_jobs.remove(rjob)
-                        print(tmp_time, 'check: ending ', rjob['job_idx'], rjob['remaining_iterations'])
+                        scheduler._logger.info(f'{tmp_time} check: ending  {rjob["job_idx"]} {rjob["remaining_iterations"]}')
                         pass
                 #sort jobs with shortest first
                 if gputime:
@@ -301,31 +306,57 @@ def mps_sim_jobs(scheduler=None, gputime=False, place=False):
 
                 run_jobs = list()
                 preempt_jobs = list()
-                #scan / execute jobs one by one
-                CLUSTER.empty_infra()
+                
+                # 基于空集群和当前job的顺序，判断哪些工作需要运行
+                CLUSTER_TMP.empty_infra()
+                # runnable_jobs_tmp = copy.deepcopy(JOBS.runnable_jobs)
+                for rjob in JOBS.runnable_jobs:
+                    ret = try_get_job_res(rjob, alloc_flag=False) 
+                    scheduler._logger.info(f'{rjob["job_idx"]} need {rjob["num_gpu"]} gpu, ret:{ret}')
+                    if ret:
+                        run_jobs.append(rjob)
+                        
+
+                # 获取需要抢占的job
                 for rjob in JOBS.runnable_jobs:
                     if 'RUNNING' == rjob['status']:
-                        if rjob['job_idx'] in scheduler._trainers:
-                            scheduler._trainers.pop(rjob['job_idx'])
-                        jobinfo = JOBS.to_jobinfo(rjob)
-                        scheduler._controller.kill(jobinfo)
-                        assert 'placements' in rjob
-                        del rjob['placements'][:]
-
-                    ret = try_get_job_res(rjob) 
-                    if True == ret:
+                        if rjob not in run_jobs:                                                    # 之前运行，现在不运行    
+                            # 更新迭代次数等
+                            # tmp = tmp_time - rjob['last_check_time']
+                            # rjob['total_executed_time'] = rjob['total_executed_time'] + tmp
+                            # rjob['last_check_time'] = tmp_time
+                            # finished_iter = scheduler.query_stats([rjob['job_idx']])
+                            # rjob['remaining_iterations'] -= finished_iter
+                            # # print(rjob['job_idx'], rjob['remaining_iterations'], finished_iter)
+                            # rjob['remaining_time'] = rjob['iteration_time'] * rjob['remaining_iterations']
+                            # if gputime:
+                            #     rjob['remaining_gputime'] = rjob['remaining_time'] * rjob['num_gpu']
+                            # scheduler._logger.info(f'{tmp_time} check: running  {rjob["job_idx"]} {rjob["remaining_iterations"]} {rjob["total_executed_time"]}')  
+                            # kill                                    
+                            if rjob['job_idx'] in scheduler._trainers:
+                                scheduler._trainers.pop(rjob['job_idx'])
+                            jobinfo = JOBS.to_jobinfo(rjob)
+                            scheduler._controller.kill(jobinfo)
+                            CLUSTER.release_job_res(rjob)   # 释放资源
+                            assert 'placements' in rjob
+                            del rjob['placements'][:]
+                            preempt_jobs.append(rjob)       # 抢占
+                # 执行新job
+                for rjob in run_jobs:
+                    if 'RUNNING' == rjob['status'] and rjob not in preempt_jobs:                     # 之前运行，现在仍然运行
+                        scheduler._logger.info(f'scheduler, {rjob["job_idx"]}, still running')
+                    if 'PENDING' == rjob['status']:                     # 这次被调度执行的job
+                        ret = try_get_job_res(rjob) 
+                        scheduler._logger.info(f'scheduler, {rjob["job_idx"]}, real ret:{ret}')
+                        assert ret == True
+                        # test
+                        # rjob['resume'] = 1
                         rjob['job_counter'] += 1
                         if sys.maxsize == rjob['start_time']:
                             rjob['start_time'] = tmp_time
-                        if rjob['status'] == 'PENDING':
-                            run_jobs.append(rjob)
                         jobinfo = JOBS.to_jobinfo(rjob)
-                        scheduler._controller.execute(jobinfo)
-                    else:
-                        # rjob['status'] = 'PENDING'
-                        if rjob['status'] == 'RUNNING':
-                            preempt_jobs.append(rjob)
-                        continue
+                        scheduler._controller.execute(jobinfo) 
+
 
                 for job in preempt_jobs:
                     job['status'] = 'PENDING'
@@ -333,18 +364,19 @@ def mps_sim_jobs(scheduler=None, gputime=False, place=False):
                     scheduler._logger.info(f'scheduler, {job["job_idx"]}, preempt')
                 for job in run_jobs:
                     job['status'] = 'RUNNING'
-                    job['resume'] = int(job['resume'] + 1)
+                    job['resume'] = int(job['resume'] + 1)      # 这个应该是不准的，因为running的job可能是一直在运行的
                     scheduler._logger.info(f'scheduler, {job["job_idx"]}, run')
 
                 last_check_time = tmp_time
         
-            # print('at end: ', scheduler.get_time())
+            scheduler._logger.info(f'at end: {scheduler.get_time()}\n\n')
             time00 = time.time()
-            time.sleep(10)
-            LOG.checkpoint(tmp_time, scheduler, done_flag or new_flag)
+            time.sleep(10)  # 等待10s，让任务启动
+            LOG.checkpoint(tmp_time, scheduler, done_flag or new_flag)    # ljx 暂时注释
+            # LOG.checkpoint(tmp_time, scheduler)
             time01 = time.time()
-            time.sleep(FLAGS.schedule_interval-(time01-time00))
-
+            print('checkpoint time', time01-time00)
+            time.sleep(FLAGS.schedule_interval-(time01-time00))   # ljx 暂时注释
 
 
 def shortest_first_sim_jobs(scheduler=None, gputime=False, place=False):

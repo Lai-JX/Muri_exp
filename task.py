@@ -6,7 +6,7 @@ import utils
 
 
 class Task(object):
-    def __init__(self, job_info: JobInfo, scheduler_ip, trace_name, this_dir) -> None:
+    def __init__(self, job_info: JobInfo, scheduler_ip, trace_name, this_dir, model_path) -> None:
         super().__init__()
 
         self._job_num = job_info.num                # job数
@@ -21,6 +21,8 @@ class Task(object):
         self._this_dir = this_dir
         self._job_counter = job_info.job_counter    # list
         self._trace_name = trace_name
+        self._is_resumed = job_info.is_resumed      # 是否运行过
+        self._model_path = model_path
     
 
     def get_idle_port(self):
@@ -36,10 +38,14 @@ class Task(object):
 
     def real_job(self):
         bash_cmd = f'bash {self._this_dir}/workloads/run.sh'
+        print("job_num:", self._job_num, self._is_resumed)
         for i in range(self._job_num):
-            # 设置job的参数，依次为model    batch-size    num-worker    prefetch-factor    train-dir    iters    job-id         iters为剩余迭代次数
-            bash_cmd += f' {self._job_name[i]} {self._batch_size[i]} 0 2 -1 {self._iterations[i]} {self._job_id[i]} {self._job_counter[i]}' # 0、2、-1分别代表num_worker、prefetch_factor和train_dir
+            # resumed = ['--resume' if is_resumed else '' for is_resumed in self._is_resumed]
+            # 设置job的参数，依次为model    batch-size    num-worker    prefetch-factor    train-dir    iters    job-id     resume         iters为剩余迭代次数
+            bash_cmd += f' {self._job_name[i]} {self._batch_size[i]} 0 2 -1 {self._iterations[i]} {self._job_id[i]} {self._job_counter[i]} {self._is_resumed[i]}' # 0、2、-1分别代表num_worker、prefetch_factor和train_dir
+
         bash_cmd += f' {self._num_gpu}'
+        bash_cmd += f' {self._model_path}'      # 模型保存的位置
         bash_cmd += f' --scheduler-ip {self._scheduler_ip}'
         bash_cmd += f' --trainer-port {self.get_idle_port()} --this-dir {self._this_dir}/workloads'
         return bash_cmd
@@ -72,7 +78,7 @@ class Task(object):
         utils.print_ljx('environ_dict["CUDA_VISIBLE_DEVICES"]',self._gpus)
         environ_dict = dict(os.environ)
         environ_dict['CUDA_VISIBLE_DEVICES'] = self._gpus
-        print(environ_dict)
+        # print(environ_dict)
         with open(self.log_path, 'w+') as f:
             self._handler = subprocess.Popen(
                 cmd, 

@@ -26,19 +26,19 @@ def get_time(sync=False):
     return time.time()
 
 def get_sargs():
-    sargs0 = {"train_dir":args.train_dir0, "model_name":args.model0, "batch_size":args.batch_size0, "iters":args.iters0}
+    sargs0 = {"train_dir":args.train_dir0, "model_name":args.model0, "batch_size":args.batch_size0, "iters":args.iters0, "job_id":args.job_id0, "resume":args.resume0}
     sargs0["num_workers"] = args.num_workers0
     sargs0["prefetch_factor"] = args.prefetch_factor0
      
-    sargs1 = {"train_dir":args.train_dir1, "model_name":args.model1, "batch_size":args.batch_size1, "iters":args.iters1}
+    sargs1 = {"train_dir":args.train_dir1, "model_name":args.model1, "batch_size":args.batch_size1, "iters":args.iters1, "job_id":args.job_id1, "resume":args.resume1}
     sargs1["num_workers"] = args.num_workers1
     sargs1["prefetch_factor"] = args.prefetch_factor1
     
-    sargs2 = {"train_dir":args.train_dir2, "model_name":args.model2, "batch_size":args.batch_size2, "iters":args.iters2}
+    sargs2 = {"train_dir":args.train_dir2, "model_name":args.model2, "batch_size":args.batch_size2, "iters":args.iters2, "job_id":args.job_id2, "resume":args.resume2}
     sargs2["num_workers"] = args.num_workers2
     sargs2["prefetch_factor"] = args.prefetch_factor2
 
-    sargs3 = {"train_dir":args.train_dir3, "model_name":args.model3, "batch_size":args.batch_size3, "iters":args.iters3}
+    sargs3 = {"train_dir":args.train_dir3, "model_name":args.model3, "batch_size":args.batch_size3, "iters":args.iters3, "job_id":args.job_id3, "resume":args.resume3}
     sargs3["num_workers"] = args.num_workers3
     sargs3["prefetch_factor"] = args.prefetch_factor3
     
@@ -105,8 +105,8 @@ def train():
         # gpu
         cur_pid = os.getpid()
         visible_device_str = os.getenv('CUDA_VISIBLE_DEVICES')
-        print(os.environ.keys())
-        print('visible_device_str:',visible_device_str)
+        # print(os.environ.keys())
+        # print('visible_device_str:',visible_device_str)
         if visible_device_str!=None:
             split_ch = ','
             visible_devices = visible_device_str.split(split_ch)
@@ -208,15 +208,20 @@ def train():
         if sargs0['iters']!=0:
             model0.print_info()
             data_size += model0.data_size()
+            filename = f'{model0.args.model_path}/{model0.sargs["job_id"]}-{model0.sargs["model_name"]}'
+            model0.save(filename)
         if sargs1['iters']!=0:
             model1.print_info()
             data_size += model1.data_size()
+            model1.save(f'{model0.args.model_path}/{model1.sargs["job_id"]}-{model1.sargs["model_name"]}')
         if sargs2['iters']!=0:
             model2.print_info()
             data_size += model2.data_size()
+            model2.save(f'{model0.args.model_path}/{model2.sargs["job_id"]}-{model2.sargs["model_name"]}')
         if sargs3['iters']!=0:
             model3.print_info()
             data_size += model3.data_size()
+            model3.save(f'{model0.args.model_path}/{model3.sargs["job_id"]}-{model3.sargs["model_name"]}')
         
         if num_job == 1 and len(itertime_list)==0:
             itertime_list = [0]

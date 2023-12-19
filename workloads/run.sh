@@ -25,6 +25,8 @@ export JOB_ID0=$1
 shift
 export JOB_COUNTER0=$1
 shift
+export RESUME0=$1           # resume
+shift
 export MODEL1=$1
 shift
 export BS1=$1
@@ -40,6 +42,8 @@ shift
 export JOB_ID1=$1
 shift
 export JOB_COUNTER1=$1
+shift
+export RESUME1=$1           # resume
 shift
 export MODEL2=$1
 shift
@@ -57,6 +61,8 @@ export JOB_ID2=$1
 shift
 export JOB_COUNTER2=$1
 shift
+export RESUME2=$1           # resume
+shift
 export MODEL3=$1
 shift
 export BS3=$1
@@ -73,7 +79,11 @@ export JOB_ID3=$1
 shift
 export JOB_COUNTER3=$1
 shift
+export RESUME3=$1           # resume
+shift
 export NUM_GPU=$1
+shift
+export MODEL_PATH=$1
 shift
 
 THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"    # 获取当前目录的绝对位置
@@ -165,6 +175,28 @@ if [[ "$TRAIN_DIR3" == "-1" ]]; then
     fi
 fi
 
+# deal with resume
+if [ $RESUME0 == "True" ]; then
+    RESUME0="--resume0"
+else
+    RESUME0=""
+fi
+if [ $RESUME1 == "True" ]; then
+    RESUME1="--resume1"
+else
+    RESUME1=""
+fi
+if [ $RESUME2 == "True" ]; then
+    RESUME2="--resume2"
+else
+    RESUME2=""
+fi
+if [ $RESUME3 == "True" ]; then
+    RESUME3="--resume3"
+else
+    RESUME3=""
+fi
+
 hostfile=$THIS_DIR/hostfiles/hostfile-[${JOB_ID0}-${JOB_ID1}-${JOB_ID2}-${JOB_ID3}]-[${JOB_COUNTER0}-${JOB_COUNTER1}-${JOB_COUNTER2}-${JOB_COUNTER3}]
 # echo $hostfile
 
@@ -193,12 +225,14 @@ fi
 if [ $JOB_ID3 -gt $ID_MAX ]; then
     ID_MAX=$JOB_ID3
 fi
-echo "mpirun -n $NUM_GPU  ${COMMON_CMD} /root/anaconda3/envs/muri/bin/python3 $THIS_DIR/main_real_util.py --model0 $MODEL0 --batch-size0 $BS0 --train-dir0 $TRAIN_DIR0 --num-workers0 ${NUM_WORKERS0} --prefetch-factor0 ${PREFETCH_FACTOR0} --iters0 $ITER0 --job-id0 $JOB_ID0 --model1 $MODEL1 --batch-size1 $BS1 --train-dir1 $TRAIN_DIR1 --num-workers1 ${NUM_WORKERS1} --prefetch-factor1 ${PREFETCH_FACTOR1} --iters1 $ITER1 --job-id1 $JOB_ID1 --model2 $MODEL2 --batch-size2 $BS2 --train-dir2 $TRAIN_DIR2 --num-workers2 ${NUM_WORKERS2} --prefetch-factor2 ${PREFETCH_FACTOR2} --iters2 $ITER2 --job-id2 $JOB_ID2 --model3 $MODEL3 --batch-size3 $BS3 --train-dir3 $TRAIN_DIR3 --num-workers3 ${NUM_WORKERS3} --prefetch-factor3 ${PREFETCH_FACTOR3} --iters3 $ITER3 --job-id3 $JOB_ID3 --this-dir $THIS_DIR $arg"
+
+
+echo "mpirun -n $NUM_GPU  ${COMMON_CMD} /root/anaconda3/envs/muri/bin/python3 $THIS_DIR/main_real_util.py --model0 $MODEL0 --batch-size0 $BS0 --train-dir0 $TRAIN_DIR0 --num-workers0 ${NUM_WORKERS0} --prefetch-factor0 ${PREFETCH_FACTOR0} --iters0 $ITER0 --job-id0 $JOB_ID0 $RESUME0 --model1 $MODEL1 --batch-size1 $BS1 --train-dir1 $TRAIN_DIR1 --num-workers1 ${NUM_WORKERS1} --prefetch-factor1 ${PREFETCH_FACTOR1} --iters1 $ITER1 --job-id1 $JOB_ID1 $RESUME1 --model2 $MODEL2 --batch-size2 $BS2 --train-dir2 $TRAIN_DIR2 --num-workers2 ${NUM_WORKERS2} --prefetch-factor2 ${PREFETCH_FACTOR2} --iters2 $ITER2 --job-id2 $JOB_ID2 $RESUME2 --model3 $MODEL3 --batch-size3 $BS3 --train-dir3 $TRAIN_DIR3 --num-workers3 ${NUM_WORKERS3} --prefetch-factor3 ${PREFETCH_FACTOR3} --iters3 $ITER3 --job-id3 $JOB_ID3 $RESUME3 --this-dir $THIS_DIR $arg >$THIS_DIR/test_${ID_MAX}.txt"
 
 echo -e "\n\n\n"
 # exec /home/jxlai/share/openmpi/bin/mpirun -n $NUM_GPU --npernode $GPU_PERNODE ${COMMON_CMD} \       # ljx: mpirun需要用绝对路径，否则会报错
 #     python3 $THIS_DIR/main_real_util.py --model0 $MODEL0 --batch-size0 $BS0 --train-dir0 $TRAIN_DIR0 --num-workers0 ${NUM_WORKERS0} --prefetch-factor0 ${PREFETCH_FACTOR0} --iters0 $ITER0 --job-id0 $JOB_ID0 --model1 $MODEL1 --batch-size1 $BS1 --train-dir1 $TRAIN_DIR1 --num-workers1 ${NUM_WORKERS1} --prefetch-factor1 ${PREFETCH_FACTOR1} --iters1 $ITER1 --job-id1 $JOB_ID1 --model2 $MODEL2 --batch-size2 $BS2 --train-dir2 $TRAIN_DIR2 --num-workers2 ${NUM_WORKERS2} --prefetch-factor2 ${PREFETCH_FACTOR2} --iters2 $ITER2 --job-id2 $JOB_ID2 --model3 $MODEL3 --batch-size3 $BS3 --train-dir3 $TRAIN_DIR3 --num-workers3 ${NUM_WORKERS3} --prefetch-factor3 ${PREFETCH_FACTOR3} --iters3 $ITER3 --job-id3 $JOB_ID3 --this-dir $THIS_DIR $arg >$THIS_DIR/test_${ID_MAX}.txt # ljx
-exec  mpirun -n $NUM_GPU  ${COMMON_CMD} /root/anaconda3/envs/muri/bin/python3 $THIS_DIR/main_real_util.py --model0 $MODEL0 --batch-size0 $BS0 --train-dir0 $TRAIN_DIR0 --num-workers0 ${NUM_WORKERS0} --prefetch-factor0 ${PREFETCH_FACTOR0} --iters0 $ITER0 --job-id0 $JOB_ID0 --model1 $MODEL1 --batch-size1 $BS1 --train-dir1 $TRAIN_DIR1 --num-workers1 ${NUM_WORKERS1} --prefetch-factor1 ${PREFETCH_FACTOR1} --iters1 $ITER1 --job-id1 $JOB_ID1 --model2 $MODEL2 --batch-size2 $BS2 --train-dir2 $TRAIN_DIR2 --num-workers2 ${NUM_WORKERS2} --prefetch-factor2 ${PREFETCH_FACTOR2} --iters2 $ITER2 --job-id2 $JOB_ID2 --model3 $MODEL3 --batch-size3 $BS3 --train-dir3 $TRAIN_DIR3 --num-workers3 ${NUM_WORKERS3} --prefetch-factor3 ${PREFETCH_FACTOR3} --iters3 $ITER3 --job-id3 $JOB_ID3 --this-dir $THIS_DIR $arg >$THIS_DIR/test_${ID_MAX}.txt # ljx
+exec  mpirun -n $NUM_GPU  ${COMMON_CMD} /root/anaconda3/envs/muri/bin/python3 $THIS_DIR/main_real_util.py --model0 $MODEL0 --batch-size0 $BS0 --train-dir0 $TRAIN_DIR0 --num-workers0 ${NUM_WORKERS0} --prefetch-factor0 ${PREFETCH_FACTOR0} --iters0 $ITER0 --job-id0 $JOB_ID0 $RESUME0 --model1 $MODEL1 --batch-size1 $BS1 --train-dir1 $TRAIN_DIR1 --num-workers1 ${NUM_WORKERS1} --prefetch-factor1 ${PREFETCH_FACTOR1} --iters1 $ITER1 --job-id1 $JOB_ID1 $RESUME1 --model2 $MODEL2 --batch-size2 $BS2 --train-dir2 $TRAIN_DIR2 --num-workers2 ${NUM_WORKERS2} --prefetch-factor2 ${PREFETCH_FACTOR2} --iters2 $ITER2 --job-id2 $JOB_ID2 $RESUME2 --model3 $MODEL3 --batch-size3 $BS3 --train-dir3 $TRAIN_DIR3 --num-workers3 ${NUM_WORKERS3} --prefetch-factor3 ${PREFETCH_FACTOR3} --iters3 $ITER3 --job-id3 $JOB_ID3 $RESUME3 --this-dir $THIS_DIR --model-path $MODEL_PATH $arg >$THIS_DIR/test_${ID_MAX}.txt # ljx
 
 # exec mpirun -n 8 --npernode 4 --hostfile /home/jxlai/project/Muri_exp/workloads/hostfiles/hostfile-[0--1--1--1]-[1-0-0-0] python3 /home/jxlai/project/Muri_exp/workloads/main_real_util.py --model0 vgg16 --batch-size0 16 --train-dir0 /home/jxlai/project/Muri_exp/workloads/datasets/imagenet --num-workers0 0 --prefetch-factor0 2 --iters0 65 --job-id0 0 --model1 0 --batch-size1 0 --train-dir1 /home/jxlai/project/Muri_exp/workloads/datasets/imagenet --num-workers1 0 --prefetch-factor1 2 --iters1 0 --job-id1 -1 --model2 0 --batch-size2 0 --train-dir2 /home/jxlai/project/Muri_exp/workloads/datasets/imagenet --num-workers2 0 --prefetch-factor2 2 --iters2 0 --job-id2 -1 --model3 0 --batch-size3 0 --train-dir3 /home/jxlai/project/Muri_exp/workloads/datasets/imagenet --num-workers3 0 --prefetch-factor3 2 --iters3 0 --job-id3 -1 --this-dir /home/jxlai/project/Muri_exp/workloads --scheduler-ip 10.0.0.11 --trainer-port 9013 --this-dir /home/jxlai/project/Muri_exp/workloads >/home/jxlai/project/Muri_exp/workloads/test_0.txt
 

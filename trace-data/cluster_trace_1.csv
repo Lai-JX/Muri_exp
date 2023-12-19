@@ -1,2 +1,2 @@
 job_id,num_gpu,submit_time,iterations,model_name,batch_size,duration,interval,iteration_time,resource_time_0,resource_time_1,resource_time_2,priority
-45,1,274404000,176,resnet18,128,132000,25000,779,711,110,0,0
+47,1,275456000,108,dqn,128,53000,149000,490,446,8,0,1

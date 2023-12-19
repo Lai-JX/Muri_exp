@@ -28,7 +28,7 @@ parser.add_argument('--this-dir', type=str, default='./',
                     help='the path of this file')
 
 # common for CV
-parser.add_argument('--num-classes', type=int, default=1000,
+parser.add_argument('--num-classes', type=int, default=100,
                     help='number of classes')
 
 # common for nlp
@@ -81,6 +81,17 @@ parser.add_argument('--iters2', type=int, default=100,
                     help='number of iters to train')
 parser.add_argument('--iters3', type=int, default=100,
                     help='number of iters to train')
+
+parser.add_argument('--resume0', action='store_true',
+                    help='Whether it is resumed or not')
+parser.add_argument('--resume1', action='store_true',
+                    help='Whether it is resumed or not')
+parser.add_argument('--resume2', action='store_true',
+                    help='Whether it is resumed or not')
+parser.add_argument('--resume3', action='store_true',
+                    help='Whether it is resumed or not')
+parser.add_argument('--model-path', type=str, default='./',
+                    help='path to save model')
 
 
 # common for NLP

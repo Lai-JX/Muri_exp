@@ -19,6 +19,7 @@ class Trainer(object):
         self._logger = utils.make_logger(__name__)
         self._start_time = time.time()
         self._finished_iteraions = 0
+        self._reported_iteraions = 0        # 已经上报的迭代次数
 
         self._client_for_scheduler = trainer_client.TrainerClientForScheduler(self._logger, scheduler_ip, scheduler_port)
         self.init_stats()
@@ -72,8 +73,11 @@ class Trainer(object):
 
 
     def _query_stats_impl(self):
-        self._logger.info(f'trainer query stats, {self._finished_iteraions}')
-        return self._finished_iteraions
+        tmp = self._finished_iteraions
+        report_iteraions = tmp - self._reported_iteraions       # 两次查询的间隔执行了多少次迭代
+        self._reported_iteraions = tmp
+        self._logger.info(f'trainer query stats, {report_iteraions}')
+        return report_iteraions
 
 
     # def demotion(self) -> bool:

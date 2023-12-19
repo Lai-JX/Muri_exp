@@ -27,7 +27,7 @@ service ssh restart     # 防止系统抽风
 placement=('yarn')
 export schedules_all=$1
 shift
-jobs=('cluster_trace_1')
+jobs=('cluster_trace_12')
 setups=("n2g2")
 packing_nums=("4")
 schedule_intervals=("60")          # 6分钟（和论文中一致）ljx:这里先改为10s
@@ -53,9 +53,12 @@ for setup in ${setups[@]};do                                                    
                             mkdir $THIS_DIR/$log_name
                             # rm $THIS_DIR/$log_name/*.log
                             job_log="$THIS_DIR/job_logs/${trace_name}/${s}-${p}-${packing_num}"             # worker.py的log path: job_logs/n4g4jcluster_tracep4si360ff60/dlas-gpu-yarn-4
+                            model_path="$THIS_DIR/model/${trace_name}/${s}-${p}-${packing_num}"
                             rm -rf $job_log
+                            rm -rf $model_path
                             # rm $THIS_DIR/${log_name}/my_log.log
                             mkdir -p $job_log      # ljx 直接在这里创建，不然后面多个worker创建可能会冲突（task.py:100）
+                            mkdir -p $model_path
                             echo "running..." $setup $job $s 'worker-id:'$WORKER_ID $SCHEDULER_IP
                             if [ $WORKER_ID -eq 1 ]; then
                                 # start scheduler for the main node

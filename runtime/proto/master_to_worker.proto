@@ -17,6 +17,7 @@ message JobInfo {
     string gpus = 7;
     repeated uint32 job_counter = 8;
     uint32 num_gpu = 9;
+    repeated bool is_resumed = 10;
 }
 
 message ExecuteRequest {

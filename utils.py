@@ -15,7 +15,7 @@ FLAGS = flags.FLAGS
 
 def make_logger(name, path=None):
     LOG_FORMAT = '{name}:{levelname} [{asctime}] {message}'
-    print('path:',path)
+    print('log path:',path)
 
     logger = logging.getLogger(name)
     logger.setLevel(logging.DEBUG)

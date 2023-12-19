@@ -2,6 +2,7 @@ syntax = "proto3";
 
 service SchedulerToTrainer {
     rpc QueryStats (QueryStatsRequest) returns (QueryStatsResponse) {};
+    rpc SaveModel (SaveModelRequest) returns (SaveModelResponse) {};
 }
 
 message QueryStatsRequest {
@@ -10,4 +11,12 @@ message QueryStatsRequest {
 
 message QueryStatsResponse {
     uint32 finished_iterations = 1;
+}
+
+message SaveModelRequest {
+
+}
+
+message SaveModelResponse {
+    bool success = 1;
 }

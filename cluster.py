@@ -954,8 +954,10 @@ class _Cluster(object):
 
 
 CLUSTER = _Cluster()
+CLUSTER_TMP = _Cluster()
 
 
 _allowed_symbols = [
-    'CLUSTER'
+    'CLUSTER',
+    'CLUSTER_TMP'
 ]

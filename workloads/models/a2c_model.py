@@ -39,6 +39,10 @@ class A2CModel:
         config.max_steps = int(2e7)
 
         self.model = A2CAgent(config)
+        # 恢复模型
+        if self.sargs["resume"]:
+            filename = f'{self.args.model_path}/{self.sargs["job_id"]}-{self.sargs["model_name"]}'
+            self.model.load(filename)
         self.config = self.model.config
 
         self.optimizer = hvd.DistributedOptimizer(self.model.optimizer, named_parameters=self.model.network.named_parameters(prefix='model'+str(self.idx)))

@@ -117,5 +117,8 @@ if __name__ == '__main__':
     # if 2*len(_node_id) != _num_gpu:
     #     hostfile_list = hostfile_list[0:-1]                                                                             # ljx:需要改为从gpu1开始
     #     hostfile_list.append(f'gpu{(_node_id[-1]+1)} slots={_num_gpu-(len(_node_id)-1)*2} port=6789') 
-    print(parse_xml('./workloads/profiling1.xml'))
-    print(parse_xml('./workloads/profiling0.xml'))
+    # print(parse_xml('./workloads/profiling1.xml'))
+    # print(parse_xml('./workloads/profiling0.xml'))
+    log_path = '/home/jxlai/nfs-share/Muri_exp/results/n2g2jcluster_trace_12p4si60ff0/mps-yarn-4'
+    s = log_path.replace("results", "model")
+    print(s)

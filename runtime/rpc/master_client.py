@@ -38,6 +38,7 @@ class MasterClientForWorker(object):
         request.job_info.gpus = job_info.gpus
         request.job_info.job_counter.extend(list(job_info.job_counter))
         request.job_info.num_gpu = int(job_info.num_gpu)
+        request.job_info.is_resumed.extend(list(job_info.is_resumed))
         response = self._stub.Execute(request)
         assert response.success == True
     

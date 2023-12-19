@@ -15,8 +15,11 @@ class DQNModel:
         if hvd.local_rank()==0:
             mkdir('log')
             mkdir('tf_log')
+            mkdir('model')
         self.device = torch.device("cuda:%d" % (hvd.local_rank()))
         Config.DEVICE = self.device
+        config = Config()
+        
         kwargs = dict()
         kwargs['log_level'] = 0
         kwargs['n_step'] = 1
@@ -24,7 +27,6 @@ class DQNModel:
         kwargs['async_replay'] = False
         kwargs['game'] = 'BreakoutNoFrameskip-v4'
         kwargs['run'] = 0
-        config = Config()
         config.merge(kwargs)
         config.task_fn = lambda: Task(config.game)
         config.eval_env = config.task_fn()
@@ -57,10 +59,15 @@ class DQNModel:
         config.gradient_clip = 5
         config.double_q = False
         config.async_actor = False
-        # if hvd.rank()==0:
-        #     print(config)
-        self.model = DQNAgent(config)   # blocked here
-        # print("build model!!!!!")
+            # if hvd.rank()==0:
+            #     print(config)
+        self.model = DQNAgent(config)   
+
+        if self.sargs["resume"]:
+            filename = f'{self.args.model_path}/{self.sargs["job_id"]}-{self.sargs["model_name"]}'
+            self.model.load(filename)
+
+
         self.optimizer = hvd.DistributedOptimizer(self.model.optimizer, named_parameters=self.model.network.named_parameters(prefix='model'+str(self.idx)))
         hvd.broadcast_parameters(self.model.network.state_dict(), root_rank=0)
         hvd.broadcast_optimizer_state(self.optimizer, root_rank=0)
@@ -129,3 +136,11 @@ class DQNModel:
 
     def data_size(self):
         return 0
+    
+
+    def save(self, filename):
+        self.model.save(filename)
+
+
+# d = DQNModel(1,2,3)
+# d.load('11','ff')

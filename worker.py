@@ -17,7 +17,8 @@ class Worker(object):
         super().__init__()
 
         self._logger = utils.make_logger(__name__, log_path+'/worker.log')
-        
+        self._model_path = log_path.replace("results", "model")
+
         self._master_ip = master_ip
         self._master_port = master_port
         self._work_ip = worker_ip
@@ -94,7 +95,9 @@ class Worker(object):
     def _execute_impl(self, job_info) -> bool:
         # self._logger.info(f'{"ljx: worker execute!", "schedule ip:", self._master_ip}')
         success = True
-        task = Task(job_info, self._master_ip, self._trace_name, self._this_dir)
+        # 解析model-path
+
+        task = Task(job_info, self._master_ip, self._trace_name, self._this_dir, self._model_path)
         cmd = task.run()
         self._tasks[(max(task._job_id), max(task._job_counter))] = (task, job_info)
 

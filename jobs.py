@@ -407,7 +407,7 @@ class _TFJobs(object):
         for job in self.job_list:
             max_submit_time = job['submit_time'] if job['submit_time'] > max_submit_time else max_submit_time
         for job in self.job_list:
-            job['submit_time'] = job['submit_time'] / max_submit_time * 1800 -1790      # 将时间缩放到半小时内 -300
+            job['submit_time'] = job['submit_time'] / max_submit_time * 1800 - 300      # 将时间缩放到半小时内 -300
 
         self.job_list.sort(key = lambda e:e.__getitem__('submit_time'))
         utils.print_fn('   Jobs are sorted with their start time')
@@ -847,6 +847,7 @@ class _TFJobs(object):
                     gpu_list[node_id] = str(gpu)
                 else:
                     gpu_list[node_id] += f',{gpu}'          # gpu_list={'node_id':gpu_list}
+        resumed_list = [True if rjob and rjob['resume'] > 0 else False for rjob in ejob]                                   # 是否为之前执行过的job
         jobinfo = JobInfo(num=job_num, gpus=gpu_list[node_id_list[0]], num_gpu=ejob[0]['num_gpu'])
         jobinfo.node_id.extend(node_id_list)
         jobinfo.job_id.extend(job_id_list)
@@ -854,6 +855,7 @@ class _TFJobs(object):
         jobinfo.batch_size.extend(batch_size_list)
         jobinfo.iterations.extend(iters_list)
         jobinfo.job_counter.extend(job_counter_list)
+        jobinfo.is_resumed.extend(resumed_list)
         # exit(0)
         return jobinfo
 
