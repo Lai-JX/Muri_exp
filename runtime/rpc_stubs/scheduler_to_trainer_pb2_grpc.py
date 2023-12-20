@@ -19,12 +19,23 @@ class SchedulerToTrainerStub(object):
                 request_serializer=scheduler__to__trainer__pb2.QueryStatsRequest.SerializeToString,
                 response_deserializer=scheduler__to__trainer__pb2.QueryStatsResponse.FromString,
                 )
+        self.SaveModel = channel.unary_unary(
+                '/SchedulerToTrainer/SaveModel',
+                request_serializer=scheduler__to__trainer__pb2.SaveModelRequest.SerializeToString,
+                response_deserializer=scheduler__to__trainer__pb2.SaveModelResponse.FromString,
+                )
 
 
 class SchedulerToTrainerServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def QueryStats(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def SaveModel(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -37,6 +48,11 @@ def add_SchedulerToTrainerServicer_to_server(servicer, server):
                     servicer.QueryStats,
                     request_deserializer=scheduler__to__trainer__pb2.QueryStatsRequest.FromString,
                     response_serializer=scheduler__to__trainer__pb2.QueryStatsResponse.SerializeToString,
+            ),
+            'SaveModel': grpc.unary_unary_rpc_method_handler(
+                    servicer.SaveModel,
+                    request_deserializer=scheduler__to__trainer__pb2.SaveModelRequest.FromString,
+                    response_serializer=scheduler__to__trainer__pb2.SaveModelResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -62,5 +78,22 @@ class SchedulerToTrainer(object):
         return grpc.experimental.unary_unary(request, target, '/SchedulerToTrainer/QueryStats',
             scheduler__to__trainer__pb2.QueryStatsRequest.SerializeToString,
             scheduler__to__trainer__pb2.QueryStatsResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def SaveModel(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/SchedulerToTrainer/SaveModel',
+            scheduler__to__trainer__pb2.SaveModelRequest.SerializeToString,
+            scheduler__to__trainer__pb2.SaveModelResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '../rpc_stubs'))
 
-from runtime.rpc_stubs.scheduler_to_trainer_pb2 import QueryStatsResponse
+from runtime.rpc_stubs.scheduler_to_trainer_pb2 import QueryStatsResponse, SaveModelResponse
 from runtime.rpc_stubs.scheduler_to_trainer_pb2_grpc import SchedulerToTrainerServicer
 import runtime.rpc_stubs.scheduler_to_trainer_pb2_grpc as s2t_rpc
 
@@ -22,8 +22,18 @@ class TrainerServerForScheduler(SchedulerToTrainerServicer):
         assert 'QueryStats' in self._callbacks
         query_stats_impl = self._callbacks['QueryStats']
 
-        finished_iterations = query_stats_impl()
-        response = QueryStatsResponse(finished_iterations=finished_iterations)
+        finished_iterations, iteration_time = query_stats_impl()
+        response = QueryStatsResponse(finished_iterations=finished_iterations, iteration_time=iteration_time)
+
+        return response
+    
+    def SaveModel(self, request, context):
+        # return super().QueryStats(request, context)
+        assert 'SaveModel' in self._callbacks
+        save_model_impl = self._callbacks['SaveModel']
+
+        success = save_model_impl()
+        response = SaveModelResponse(success=success)
 
         return response
 

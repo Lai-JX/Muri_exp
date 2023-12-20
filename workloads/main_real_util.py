@@ -84,6 +84,28 @@ def get_data(id):
 # GND 
 #  GND
 def train():
+
+    def save_model():
+        data_size = 0
+        if sargs0['iters']!=0:
+            model0.print_info()
+            data_size += model0.data_size()
+            filename = f'{model0.args.model_path}/{model0.sargs["job_id"]}-{model0.sargs["model_name"]}'
+            model0.save(filename)
+        if sargs1['iters']!=0:
+            model1.print_info()
+            data_size += model1.data_size()
+            model1.save(f'{model0.args.model_path}/{model1.sargs["job_id"]}-{model1.sargs["model_name"]}')
+        if sargs2['iters']!=0:
+            model2.print_info()
+            data_size += model2.data_size()
+            model2.save(f'{model0.args.model_path}/{model2.sargs["job_id"]}-{model2.sargs["model_name"]}')
+        if sargs3['iters']!=0:
+            model3.print_info()
+            data_size += model3.data_size()
+            model3.save(f'{model0.args.model_path}/{model3.sargs["job_id"]}-{model3.sargs["model_name"]}')
+        return data_size
+    
     time_st = time.time()
     time_all = 0.0
     cur_iter = 0
@@ -190,7 +212,7 @@ def train():
         time_end = time.time()
         cur_iter += 1
         if hvd.rank()==0:
-            trainer.record(time_end-time_st)
+            
             if cur_iter > last_iter:
                 time_all += time_end-time_st
                 if cur_iter >= iter_list[tmp_iter]:     # 某个job完成了
@@ -198,30 +220,36 @@ def train():
                     last_iter = iter_list[tmp_iter]+5   # 为什么要加5
                     tmp_iter += 1
                     time_all = 0
+            if trainer.record(time_end-time_st) == 'save':
+                print("save model before kill")
+                save_model()
+                trainer.save_finish()
+                # break
             # print(cur_iter, " time: ", time_end-time_st)
         time_st = time.time()
     time_io = time.time()-time_st   # 这里减去的应该是time_io_st？
 
     if hvd.rank()==0:
         print("Model Info:")
-        data_size = 0
-        if sargs0['iters']!=0:
-            model0.print_info()
-            data_size += model0.data_size()
-            filename = f'{model0.args.model_path}/{model0.sargs["job_id"]}-{model0.sargs["model_name"]}'
-            model0.save(filename)
-        if sargs1['iters']!=0:
-            model1.print_info()
-            data_size += model1.data_size()
-            model1.save(f'{model0.args.model_path}/{model1.sargs["job_id"]}-{model1.sargs["model_name"]}')
-        if sargs2['iters']!=0:
-            model2.print_info()
-            data_size += model2.data_size()
-            model2.save(f'{model0.args.model_path}/{model2.sargs["job_id"]}-{model2.sargs["model_name"]}')
-        if sargs3['iters']!=0:
-            model3.print_info()
-            data_size += model3.data_size()
-            model3.save(f'{model0.args.model_path}/{model3.sargs["job_id"]}-{model3.sargs["model_name"]}')
+        # data_size = 0
+        # if sargs0['iters']!=0:
+        #     model0.print_info()
+        #     data_size += model0.data_size()
+        #     filename = f'{model0.args.model_path}/{model0.sargs["job_id"]}-{model0.sargs["model_name"]}'
+        #     model0.save(filename)
+        # if sargs1['iters']!=0:
+        #     model1.print_info()
+        #     data_size += model1.data_size()
+        #     model1.save(f'{model0.args.model_path}/{model1.sargs["job_id"]}-{model1.sargs["model_name"]}')
+        # if sargs2['iters']!=0:
+        #     model2.print_info()
+        #     data_size += model2.data_size()
+        #     model2.save(f'{model0.args.model_path}/{model2.sargs["job_id"]}-{model2.sargs["model_name"]}')
+        # if sargs3['iters']!=0:
+        #     model3.print_info()
+        #     data_size += model3.data_size()
+        #     model3.save(f'{model0.args.model_path}/{model3.sargs["job_id"]}-{model3.sargs["model_name"]}')
+        data_size = save_model()
         
         if num_job == 1 and len(itertime_list)==0:
             itertime_list = [0]

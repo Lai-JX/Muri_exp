@@ -239,7 +239,7 @@ class _TFJobs(object):
                 job_dict['priority'] = random.randint(0,1)
             if 'gpu_util' not in job_dict:
                 if job_dict['priority']==0:
-                    job_dict['gpu_util'] = 0.1 # not real
+                    job_dict['gpu_util'] = 0.1 # not real                       # ljx
                 else:
                     job_dict['gpu_util'] = 0.9
 

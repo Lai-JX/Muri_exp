@@ -241,7 +241,7 @@ def mps_sim_jobs(scheduler=None, gputime=False, place=False):
         while (len(JOBS.job_events) + len(JOBS.runnable_jobs))> 0:
             done_flag = False
             new_flag = False
-            scheduler._logger.info(f'\n\nbefore: {scheduler.get_time()}')
+            scheduler._logger.info(f'before: {scheduler.get_time()}')
             # scheduler._logger.info(f'{JOBS.job_events}\n{JOBS.runnable_jobs}')
             while not scheduler._controller.done_queue.empty():
                 finished_time, job_id, worker_id, gpus, returncode = scheduler._controller.done_queue.get()
@@ -272,18 +272,19 @@ def mps_sim_jobs(scheduler=None, gputime=False, place=False):
                     s_job['remaining_gputime'] = s_job['remaining_time'] * s_job['num_gpu']
                     scheduler._logger.info(f'---- job[{s_job["job_idx"]}] is added')
                 new_flag = True
-            
+            time00 = time.time()
             tmp_time = scheduler.get_time()
             if done_flag or new_flag:
-                assert tmp_time - last_check_time > FLAGS.schedule_interval or tmp_time < FLAGS.schedule_interval
+                # assert tmp_time - last_check_time > FLAGS.schedule_interval or tmp_time < FLAGS.schedule_interval # 取消特定周期调度
                 for rjob in JOBS.runnable_jobs:
                     if 'RUNNING' == rjob['status']:
                         # pass    # 如果是抢占式，这里需要查询并更新job迭代次数
                         tmp = tmp_time - rjob['last_check_time']
                         rjob['total_executed_time'] = rjob['total_executed_time'] + tmp
                         rjob['last_check_time'] = tmp_time
-                        finished_iter = scheduler.query_stats([rjob['job_idx']])
+                        finished_iter, iteration_time = scheduler.query_stats([rjob['job_idx']])    # 同时更新迭代时间
                         rjob['remaining_iterations'] -= finished_iter
+                        rjob['iteration_time'] = iteration_time
                         # print(rjob['job_idx'], rjob['remaining_iterations'], finished_iter)
                         rjob['remaining_time'] = rjob['iteration_time'] * rjob['remaining_iterations']
                         if gputime:
@@ -316,7 +317,6 @@ def mps_sim_jobs(scheduler=None, gputime=False, place=False):
                     if ret:
                         run_jobs.append(rjob)
                         
-
                 # 获取需要抢占的job
                 for rjob in JOBS.runnable_jobs:
                     if 'RUNNING' == rjob['status']:
@@ -332,7 +332,9 @@ def mps_sim_jobs(scheduler=None, gputime=False, place=False):
                             # if gputime:
                             #     rjob['remaining_gputime'] = rjob['remaining_time'] * rjob['num_gpu']
                             # scheduler._logger.info(f'{tmp_time} check: running  {rjob["job_idx"]} {rjob["remaining_iterations"]} {rjob["total_executed_time"]}')  
-                            # kill                                    
+                            # kill           
+                            scheduler.save_model([rjob['job_idx']])          
+                            # time.sleep(rjob['iteration_time']*1.2)               
                             if rjob['job_idx'] in scheduler._trainers:
                                 scheduler._trainers.pop(rjob['job_idx'])
                             jobinfo = JOBS.to_jobinfo(rjob)
@@ -369,14 +371,18 @@ def mps_sim_jobs(scheduler=None, gputime=False, place=False):
 
                 last_check_time = tmp_time
         
-            scheduler._logger.info(f'at end: {scheduler.get_time()}\n\n')
-            time00 = time.time()
             time.sleep(10)  # 等待10s，让任务启动
             LOG.checkpoint(tmp_time, scheduler, done_flag or new_flag)    # ljx 暂时注释
             # LOG.checkpoint(tmp_time, scheduler)
             time01 = time.time()
-            print('checkpoint time', time01-time00)
-            time.sleep(FLAGS.schedule_interval-(time01-time00))   # ljx 暂时注释
+            print('checkpoint and save model time', time01-time00)
+            count = 0
+            while count < 15 and scheduler._controller.done_queue.empty():
+                time.sleep(1)
+                count += 1
+                # print("sleep", count)
+            scheduler._logger.info(f'at end: {scheduler.get_time()}\n\n')  
+            # time.sleep(FLAGS.schedule_interval-(time01-time00))       # 取消特定周期调度
 
 
 def shortest_first_sim_jobs(scheduler=None, gputime=False, place=False):

@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '../rpc_stubs'))
 
-from runtime.rpc_stubs.scheduler_to_trainer_pb2 import QueryStatsRequest
+from runtime.rpc_stubs.scheduler_to_trainer_pb2 import QueryStatsRequest, SaveModelRequest
 import runtime.rpc_stubs.scheduler_to_trainer_pb2_grpc as s2t_rpc
 
 import grpc
@@ -31,4 +31,11 @@ class SchedulerClientForTrainer(object):
         request = QueryStatsRequest()
         response = self._stub.QueryStats(request)
         
-        return response.finished_iterations
+        return response.finished_iterations, response.iteration_time
+    
+    def save_model(self):
+        self._logger.info(f'scheduler, save model, job {self._job_id}')
+        request = SaveModelRequest()
+        response = self._stub.SaveModel(request)
+        
+        return response.success

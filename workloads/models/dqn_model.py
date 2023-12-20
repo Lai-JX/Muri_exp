@@ -65,6 +65,7 @@ class DQNModel:
 
         if self.sargs["resume"]:
             filename = f'{self.args.model_path}/{self.sargs["job_id"]}-{self.sargs["model_name"]}'
+            print("load model from ", filename)
             self.model.load(filename)
 
 

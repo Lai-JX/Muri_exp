@@ -57,6 +57,6 @@ themis1:
 
 # mps
 mps:
-	./kill.sh; ./run.sh 192.168.1.104 9001 9013 1 mps
+	rm ./workloads/*.txt; rm ./workloads/*.out; rm ./workloads/*.xml; rm ./workloads/hostfiles/hostfile-*; ./kill.sh; ./run.sh 192.168.1.104 9001 9013 1 mps
 mps1:
-	./kill.sh; ./run.sh 192.168.1.104 9001 9013 2 mps
+	rm ./workloads/*.txt; rm ./workloads/*.out; rm ./workloads/*.xml; rm ./workloads/hostfiles/hostfile-*; ./kill.sh; ./run.sh 192.168.1.104 9001 9013 2 mps

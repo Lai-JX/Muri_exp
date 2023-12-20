@@ -11,6 +11,7 @@ message QueryStatsRequest {
 
 message QueryStatsResponse {
     uint32 finished_iterations = 1;
+    double iteration_time = 2;
 }
 
 message SaveModelRequest {

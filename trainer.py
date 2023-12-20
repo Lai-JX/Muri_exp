@@ -20,6 +20,9 @@ class Trainer(object):
         self._start_time = time.time()
         self._finished_iteraions = 0
         self._reported_iteraions = 0        # 已经上报的迭代次数
+        self._save_flag = False             # 是否开始保存模型
+        self._save_finished = False         # 模型是否保存完成
+        self._iteration_time = 0            # 迭代时间（实时更新）
 
         self._client_for_scheduler = trainer_client.TrainerClientForScheduler(self._logger, scheduler_ip, scheduler_port)
         self.init_stats()
@@ -51,7 +54,10 @@ class Trainer(object):
 
 
     def record(self, iteration_time):
+        self._iteration_time = iteration_time
         self.update_stats(iteration_time)
+        if self._save_flag:
+            return 'save'
 
         # if self.demotion() == True:
         #     self._client_for_scheduler.report_stats(self._job_id, self._finished_iteraions, True)
@@ -61,6 +67,7 @@ class Trainer(object):
     def make_server_for_scheduler(self, port: int):
         callbacks = {
             'QueryStats' : self._query_stats_impl,
+            'SaveModel' : self._save_model_impl,
         }
 
         server_thread = threading.Thread(
@@ -77,7 +84,19 @@ class Trainer(object):
         report_iteraions = tmp - self._reported_iteraions       # 两次查询的间隔执行了多少次迭代
         self._reported_iteraions = tmp
         self._logger.info(f'trainer query stats, {report_iteraions}')
-        return report_iteraions
+        return report_iteraions, self._iteration_time
+    
+    def _save_model_impl(self):
+        self._save_flag = True
+        self._logger.info(f'trainer model save, {self._iteration_time}')
+        time.sleep(self._iteration_time)
+        while not self._save_finished:      # 等待完成，避免导致模型保存一半等问题(为了在两个进程间同步，不得已采用这种方法)
+            time.sleep(1)
+        return True
+    
+    def save_finish(self):
+        self._save_finished = True
+
 
 
     # def demotion(self) -> bool:

@@ -120,5 +120,6 @@ class CVModel:
         torch.save(self.model.state_dict(), '%s.model' % (filename))
 
     def load(self, filename):
+        print("load model from ", filename)
         state_dict = torch.load('%s.model' % filename, map_location=lambda storage, loc: storage)
         self.model.load_state_dict(state_dict)

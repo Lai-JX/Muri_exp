@@ -71,9 +71,16 @@ class Scheduler(object):
 
     def query_stats(self, job_id_list):
         job_id = max(job_id_list)
+        self._logger.info(f'scheduler, query_stats, job_id: {job_id} ')
         assert job_id in self._trainers
         finished_iterations = self._trainers[job_id].query_stats()
         return finished_iterations
+
+    def save_model(self, job_id_list):
+        job_id = max(job_id_list)
+        assert job_id in self._trainers
+        success = self._trainers[job_id].save_model()
+        return success
 
     def has_ready_jobs(self, tmp_time):
         if len(JOBS.job_events)>0 and JOBS.job_events[0]['time']<=tmp_time:

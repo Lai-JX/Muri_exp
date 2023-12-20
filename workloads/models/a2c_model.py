@@ -42,6 +42,7 @@ class A2CModel:
         # 恢复模型
         if self.sargs["resume"]:
             filename = f'{self.args.model_path}/{self.sargs["job_id"]}-{self.sargs["model_name"]}'
+            print("load model from ", filename)
             self.model.load(filename)
         self.config = self.model.config
 
@@ -114,3 +115,6 @@ class A2CModel:
 
     def data_size(self):
         return 0
+    
+    def save(self, filename):
+        self.model.save(filename)

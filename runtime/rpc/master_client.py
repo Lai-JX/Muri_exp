@@ -56,6 +56,7 @@ class MasterClientForWorker(object):
         request.job_info.job_counter.extend(list(job_info.job_counter))
         request.job_info.num_gpu = int(job_info.num_gpu)
         response = self._stub.Kill(request)
+        self._logger.info(f'kill respone: {response}')
         assert response.success == True
 
     def exit_command(self):
