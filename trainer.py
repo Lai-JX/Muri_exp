@@ -23,6 +23,7 @@ class Trainer(object):
         self._save_flag = False             # 是否开始保存模型
         self._save_finished = False         # 模型是否保存完成
         self._iteration_time = 0            # 迭代时间（实时更新）
+        self._iteration_time_list = []      # 保存最近10次迭代的时间
 
         self._client_for_scheduler = trainer_client.TrainerClientForScheduler(self._logger, scheduler_ip, scheduler_port)
         self.init_stats()
@@ -54,9 +55,15 @@ class Trainer(object):
 
 
     def record(self, iteration_time):
-        self._iteration_time = iteration_time
-        self.update_stats(iteration_time)
-        if self._save_flag:
+        n = len(self._iteration_time_list)
+        if n >= 10:
+            self._iteration_time_list.pop(0)
+            n -= 1
+        self._iteration_time_list.append(iteration_time)
+
+        self._iteration_time = sum(self._iteration_time_list) / (n+1)
+        self.update_stats(iteration_time)                           # 记录时用的是单次的迭代时间，上报用的是过去10次的平均迭代时间
+        if self._save_flag:                                         # 通知保存模型
             return 'save'
 
         # if self.demotion() == True:

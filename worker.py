@@ -95,8 +95,8 @@ class Worker(object):
     def _execute_impl(self, job_info) -> bool:
         # self._logger.info(f'{"ljx: worker execute!", "schedule ip:", self._master_ip}')
         success = True
-        # 解析model-path
 
+        self._logger.info(f'job_info.node_id: {job_info.node_id}')
         task = Task(job_info, self._master_ip, self._trace_name, self._this_dir, self._model_path)
         cmd = task.run()
         self._tasks[(max(task._job_id), max(task._job_counter))] = (task, job_info)

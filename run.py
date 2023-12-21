@@ -122,7 +122,7 @@ def parse_job_file(trace_file):
     job_idx = 0
     for row in reader: 
         #add job into JOBS,  JOBS = _TFJobs()
-        if (row['model_name'] != 'bert' and row['model_name'] != 'gpt2') and int(row['num_gpu']) <= 4:     # ljx
+        if int(row['num_gpu']) <= 4:     # ljx (row['model_name'] != 'bert' and row['model_name'] != 'gpt2') and 
             JOBS.add_job(row)
             job_idx += 1
         # if job_idx == 20:   # ljx:先只采用20个job
@@ -346,10 +346,10 @@ def mps_sim_jobs(scheduler=None, gputime=False, place=False):
                 # 执行新job
                 for rjob in run_jobs:
                     if 'RUNNING' == rjob['status'] and rjob not in preempt_jobs:                     # 之前运行，现在仍然运行
-                        scheduler._logger.info(f'scheduler, {rjob["job_idx"]}, still running')
+                        scheduler._logger.info(f'scheduler, {rjob["job_idx"]}, still running. remaining_iterations:{rjob["remaining_iterations"]} ')
                     if 'PENDING' == rjob['status']:                     # 这次被调度执行的job
                         ret = try_get_job_res(rjob) 
-                        scheduler._logger.info(f'scheduler, {rjob["job_idx"]}, real ret:{ret}')
+                        scheduler._logger.info(f'scheduler, {rjob["job_idx"]}, remaining_iterations:{rjob["remaining_iterations"]}, real ret:{ret}')
                         assert ret == True
                         # test
                         # rjob['resume'] = 1
@@ -1931,6 +1931,8 @@ def main():
         themis_sim_jobs(scheduler, )
     elif FLAGS.schedule == 'mps':                                                           # mps
         mps_sim_jobs(scheduler)
+    elif FLAGS.schedule == 'mps-gpu':                                                           # mps
+        mps_sim_jobs(scheduler, True)
     else:
         print('not support scheduler') 
 

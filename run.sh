@@ -27,7 +27,7 @@ service ssh restart     # 防止系统抽风
 placement=('yarn')
 export schedules_all=$1
 shift
-jobs=('cluster_trace_12')
+jobs=('cluster_trace_1')
 setups=("n2g2")
 packing_nums=("4")
 schedule_intervals=("60")          # 6分钟（和论文中一致）ljx:这里先改为10s

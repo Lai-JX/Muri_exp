@@ -6,7 +6,7 @@ import torch
 from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import DataLoader, Dataset
 from torch.utils.data.distributed import DistributedSampler
-from dataloader import KVReader
+# from dataloader import KVReader    # ljx
 # from py2store.base import KvReader
 
 # import torch.profiler
@@ -58,20 +58,22 @@ class TextDataset(Dataset):
         if args.use_hdfs:
             # Use HDFS datasets
             print("Loading features from HDFS")
-            self.reader = KVReader(directory, args.num_readers)
-            keys = self.reader.list_keys()
-            k_index_map = {k.strip('/'): k for k in keys}
-            if cached_features_file in k_index_map and not args.overwrite_cache:
-                # logger.info("Loading features from cached file %s", cached_features_file)
-                data = self.reader.read_many([k_index_map[cached_features_file]])[0]
-                self.examples = pickle.loads(data)
-            else:
-                data = self.reader.read_many([k_index_map[filename]])[0]
-                text = data.decode('utf-8')
-            cached_features_file_path = os.path.join(
-                args.output_dir, cached_features_file
-            )
+            NotImplementedError
+            # self.reader = KVReader(directory, args.num_readers)
+            # keys = self.reader.list_keys()
+            # k_index_map = {k.strip('/'): k for k in keys}
+            # if cached_features_file in k_index_map and not args.overwrite_cache:
+            #     # logger.info("Loading features from cached file %s", cached_features_file)
+            #     data = self.reader.read_many([k_index_map[cached_features_file]])[0]
+            #     self.examples = pickle.loads(data)
+            # else:
+            #     data = self.reader.read_many([k_index_map[filename]])[0]
+            #     text = data.decode('utf-8')
+            # cached_features_file_path = os.path.join(
+            #     args.output_dir, cached_features_file
+            # )
         else:
+            print("file_path:",file_path)
             assert os.path.isfile(file_path)
             print("Loading features from local file")
             if os.path.exists(cached_features_file_path) and not args.overwrite_cache:
@@ -81,13 +83,19 @@ class TextDataset(Dataset):
             else:
                 with open(file_path, encoding="utf-8") as f:
                     text = f.read()
+                print("text len:",len(text))
         if text:
             # Do writting
             # logger.info("Creating features from dataset file at %s", directory)
             self.examples = []
             tokenized_text = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(text))
+            print("len:",len(tokenized_text),block_size,len(tokenized_text) - block_size + 1)
             for i in range(0, len(tokenized_text) - block_size + 1, block_size):  # Truncate in block of block_size
-                self.examples.append(tokenizer.build_inputs_with_special_tokens(tokenized_text[i : i + block_size]))
+                # self.examples.append(tokenizer.build_inputs_with_special_tokens(tokenized_text[i : i + block_size]))
+                self.examples.append(tokenized_text[i : i + block_size])
+
+            # print("self.examples:",self.examples)
+            print("shape:",len(self.examples[0]))
             
             # logger.info("Saving features into cached file %s", cached_features_file_path)
             with open(cached_features_file_path, "wb") as handle:
@@ -172,14 +180,21 @@ class NLPModel:
         config = config_class()
 
         if self.sargs["model_name"] == 'bert':
-            self.tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased')
+            self.tokenizer = AutoTokenizer.from_pretrained("/root/nfs-share/Muri_exp/workloads/models/nlp/bert-base-uncased")
         else:
-            self.tokenizer = AutoTokenizer.from_pretrained(self.sargs["model_name"])
-
-        self.args.block_size = self.tokenizer.max_len_single_sentence
+            # self.tokenizer = AutoTokenizer.from_pretrained(self.sargs["model_name"])
+            self.tokenizer = AutoTokenizer.from_pretrained("/root/nfs-share/Muri_exp/workloads/models/nlp/gpt2")
+        
+        # print(self.tokenizer.model_max_length)
+        # self.args.block_size = self.tokenizer.max_len_single_sentence     # ljx
+        self.args.block_size = 512
+        # self.args.block_size = 512
 
         # logger.info("Training new nlp model from scratch")
         self.model = model_class(config=config)
+        if self.sargs["resume"]:
+            filename = f'{self.args.model_path}/{self.sargs["job_id"]}-{self.sargs["model_name"]}'
+            self.load(filename)
 
         self.model.to(self.device)
 
@@ -256,7 +271,8 @@ class NLPModel:
             labels = labels.to(self.device, non_blocking=True)
         
         self.optimizer.zero_grad()
-        outputs = self.model(inputs, masked_lm_labels=labels) if self.sargs["mlm"] else self.model(inputs, labels=labels)
+        # outputs = self.model(inputs, masked_lm_labels=labels) if self.sargs["mlm"] else self.model(inputs, labels=labels)
+        outputs = self.model(inputs, labels=labels) if self.sargs["mlm"] else self.model(inputs, labels=labels)
         loss = outputs[0]
         loss.backward()
 
@@ -278,3 +294,11 @@ class NLPModel:
         else:
             per_data_size = 10684/2361
         return self.sargs['batch_size']*per_data_size
+    
+    def save(self, filename):
+        torch.save(self.model.state_dict(), '%s.model' % (filename))
+
+    def load(self, filename):
+        print("load model from ", filename)
+        state_dict = torch.load('%s.model' % filename, map_location=lambda storage, loc: storage)
+        self.model.load_state_dict(state_dict)

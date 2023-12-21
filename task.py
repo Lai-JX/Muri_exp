@@ -61,6 +61,7 @@ class Task(object):
 
         hostfile_dir = self._this_dir+'/workloads/hostfiles'
         assert os.path.exists(hostfile_dir)
+        print('self._node_id:',self._node_id)
         # hostfile_list = [f'worker-{node_id}\n' for node_id in self._node_id]    # ljx:需要改为从gpu1开始  
         hostfile_list = [f'gpu{(node_id+1)^3} slots=2 port=6789\n' for node_id in self._node_id]                            # ^3 优先调度gpu2的gpu
         if 2*len(self._node_id) != self._num_gpu:
@@ -76,6 +77,7 @@ class Task(object):
         utils.print_ljx("task.run:hostfile_list:", hostfile_list)
         utils.print_ljx("log path after here:",self.log_path, '\n')
         utils.print_ljx('environ_dict["CUDA_VISIBLE_DEVICES"]',self._gpus)
+        # exit(0)
         environ_dict = dict(os.environ)
         environ_dict['CUDA_VISIBLE_DEVICES'] = self._gpus
         # print(environ_dict)

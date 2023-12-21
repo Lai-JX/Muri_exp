@@ -407,7 +407,7 @@ class _TFJobs(object):
         for job in self.job_list:
             max_submit_time = job['submit_time'] if job['submit_time'] > max_submit_time else max_submit_time
         for job in self.job_list:
-            job['submit_time'] = job['submit_time'] / max_submit_time * 1800 - 300      # 将时间缩放到半小时内 -300
+            job['submit_time'] = job['submit_time'] / max_submit_time * 1800 - 300      # 将时间缩放到半小时内 - 300  - 1790
 
         self.job_list.sort(key = lambda e:e.__getitem__('submit_time'))
         utils.print_fn('   Jobs are sorted with their start time')

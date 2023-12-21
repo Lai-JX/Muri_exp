@@ -60,3 +60,9 @@ mps:
 	rm ./workloads/*.txt; rm ./workloads/*.out; rm ./workloads/*.xml; rm ./workloads/hostfiles/hostfile-*; ./kill.sh; ./run.sh 192.168.1.104 9001 9013 1 mps
 mps1:
 	rm ./workloads/*.txt; rm ./workloads/*.out; rm ./workloads/*.xml; rm ./workloads/hostfiles/hostfile-*; ./kill.sh; ./run.sh 192.168.1.104 9001 9013 2 mps
+
+# mps-gpu
+mpsG:
+	rm ./workloads/datasets/wikitext-2-raw/*_wiki.train.raw; rm *.txt; rm ./workloads/*.txt; rm ./workloads/*.out; rm ./workloads/*.xml; rm ./workloads/hostfiles/hostfile-*; ./kill.sh; ./run.sh 192.168.1.104 9001 9013 1 mps-gpu
+mpsG1:
+	rm ./workloads/*.txt; rm ./workloads/*.out; rm ./workloads/*.xml; rm ./workloads/hostfiles/hostfile-*; ./kill.sh; ./run.sh 192.168.1.104 9001 9013 2 mps-gpu
