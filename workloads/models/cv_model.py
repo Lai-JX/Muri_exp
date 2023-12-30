@@ -117,9 +117,11 @@ class CVModel:
         return self.sargs["batch_size"] * 108.6
     
     def save(self, filename):
-        torch.save(self.model.state_dict(), '%s.model' % (filename))
+        with open('%s.model' % (filename),'wb') as f:
+            torch.save(self.model.state_dict(), f)
 
     def load(self, filename):
         print("load model from ", filename)
-        state_dict = torch.load('%s.model' % filename, map_location=lambda storage, loc: storage)
+        with open('%s.model' % (filename),'rb') as f:
+            state_dict = torch.load(f, map_location=lambda storage, loc: storage)
         self.model.load_state_dict(state_dict)

@@ -87,6 +87,7 @@ export MODEL_PATH=$1
 shift
 
 THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"    # 获取当前目录的绝对位置
+# THIS_DIR="/root/tmp/job"       # ljx 尽量不使用nfs profiling文件保存的位置
 echo -e '\n==='$THIS_DIR
 
 #get real datasets -- imagenet-1k

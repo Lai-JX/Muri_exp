@@ -276,7 +276,7 @@ class _TFJobs(object):
         job_dict['placements'] = list() #prepare an empty job_placement 
         job_dict['ps_placements'] = list()
         job_dict['w_placements'] = list()
-        job_dict['remaining_gpu'] = job_dict['num_gpu']
+        job_dict['remaining_gpu'] = job_dict['num_gpu']     # 还需要多少gpu
         job_dict['last_node_id'] = None
         '''
         MS_YARN: only one switch is allowed
@@ -407,7 +407,7 @@ class _TFJobs(object):
         for job in self.job_list:
             max_submit_time = job['submit_time'] if job['submit_time'] > max_submit_time else max_submit_time
         for job in self.job_list:
-            job['submit_time'] = job['submit_time'] / max_submit_time * 1800 - 300      # 将时间缩放到半小时内 - 300  - 1790
+            job['submit_time'] = job['submit_time'] / max_submit_time * 900 - 240     # 将时间缩放到半小时内 - 240  - 890
 
         self.job_list.sort(key = lambda e:e.__getitem__('submit_time'))
         utils.print_fn('   Jobs are sorted with their start time')

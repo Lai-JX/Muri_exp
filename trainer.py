@@ -64,6 +64,7 @@ class Trainer(object):
         self._iteration_time = sum(self._iteration_time_list) / (n+1)
         self.update_stats(iteration_time)                           # 记录时用的是单次的迭代时间，上报用的是过去10次的平均迭代时间
         if self._save_flag:                                         # 通知保存模型
+            self._save_flag = False                                 # 避免多次保存，导致最后保存了一半
             return 'save'
 
         # if self.demotion() == True:
@@ -95,6 +96,7 @@ class Trainer(object):
     
     def _save_model_impl(self):
         self._save_flag = True
+        self._save_finished = False
         self._logger.info(f'trainer model save, {self._iteration_time}')
         time.sleep(self._iteration_time)
         while not self._save_finished:      # 等待完成，避免导致模型保存一半等问题(为了在两个进程间同步，不得已采用这种方法)

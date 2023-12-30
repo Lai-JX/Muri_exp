@@ -21,7 +21,7 @@ reset:
 	git fetch; git reset --hard HEAD; git merge origin/master
 
 rm:
-	rm ./workloads/*.txt; rm ./workloads/*.out; rm ./workloads/*.xml; rm ./workloads/hostfiles/hostfile-*;
+	rm ./workloads/*.txt; rm ./workloads/*.out; rm ./workloads/*.xml; rm ./workloads/hostfiles/hostfile-*; rm ../../tmp/job/*.out; rm ../../tmp/job/*.xml; rm ./*.out; rm ./*.xml
 
 # rm ./workloads/*.txt; rm ./workloads/*.out; rm ./workloads/*.xml; rm ./workloads/hostfiles/hostfile-*; 
 
@@ -57,9 +57,9 @@ themis1:
 
 # mps
 mps:
-	rm ./workloads/*.txt; rm ./workloads/*.out; rm ./workloads/*.xml; rm ./workloads/hostfiles/hostfile-*; ./kill.sh; ./run.sh 192.168.1.104 9001 9013 1 mps
+	rm ./workloads/*.txt; rm ./workloads/*.out; rm ./workloads/*.xml; rm ./workloads/hostfiles/hostfile-*; rm ../../tmp/job/*.out; rm ../../tmp/job/*.xml; rm ./*.out; rm ./*.xml; ./kill.sh; ./run.sh 192.168.1.104 9002 9013 1 mps
 mps1:
-	rm ./workloads/*.txt; rm ./workloads/*.out; rm ./workloads/*.xml; rm ./workloads/hostfiles/hostfile-*; ./kill.sh; ./run.sh 192.168.1.104 9001 9013 2 mps
+	./kill.sh; ./run.sh 192.168.1.104 9002 9013 2 mps
 
 # mps-gpu
 mpsG:

@@ -179,10 +179,10 @@ class _Switch(object):
         else:
             need_cpu = int(need_gpu * 6) # worker:2, ps:4
 
-        # print("try_single_node_alloc: ", need_gpu, need_cpu, JOBS.worker_mem)
+        print("try_single_node_alloc: ", need_gpu, need_cpu, JOBS.worker_mem)
 
         for node in self.node_list:
-            # print(node.id, node.check_free_gpus(), node.check_free_cpus(), node.free_mem)
+            print(node.id, node.check_free_gpus(), node.check_free_cpus(), node.free_mem)
             if (node.check_free_gpus() >= need_gpu) and (node.check_free_cpus() >= need_cpu) and (node.free_mem >= JOBS.worker_mem):
                 # if node.alloc_gpus(need_gpu) == False:
                 if not_place==False:
@@ -261,8 +261,8 @@ class _Switch(object):
         '''
         assert job['remaining_gpu']>0
         need_gpu = job['remaining_gpu']
-        num_full_nodes = math.floor(need_gpu / self.num_gpu_p_node)
-        last_node_gpu =  need_gpu % self.num_gpu_p_node
+        num_full_nodes = math.floor(need_gpu / self.num_gpu_p_node)     # 会被利用所有gpu的节点数
+        last_node_gpu =  need_gpu % self.num_gpu_p_node                 # 最后一个节点所需的gpu数
         last_node_cpu = int(last_node_gpu * 6)
         last_node = None
         idle_node_cpu = int(self.num_gpu_p_node * 6) #w:2, ps:4
@@ -287,9 +287,9 @@ class _Switch(object):
             enough_flag = False
 
         if last_node_gpu != 0:
-            if last_node_gpu < job['num_gpu']%self.num_gpu_p_node:
+            if last_node_gpu < job['num_gpu']%self.num_gpu_p_node:  # 之前已经分配过last_node
                 last_node = self.node_list[job['last_node_id']]
-            else:
+            else:                                                   # 之前没分配过last_node
                 max_node_cnt = 0
                 max_node = None
                 for node in self.node_list:
@@ -313,8 +313,8 @@ class _Switch(object):
         node_list = list()
         idx = 0
         if last_node_gpu != 0:
-            if last_node_gpu == job['num_gpu']%self.num_gpu_p_node:
-                if last_node == None: # why this situation?
+            if last_node_gpu == job['num_gpu']%self.num_gpu_p_node:         # 第一次分配last_node
+                if last_node == None: # why this situation? 资源不够
                     node_dict = dict()
                     node_dict['id'] = -1
                     node_dict['num_gpu'] = 0
@@ -371,7 +371,7 @@ class _Switch(object):
                     node_dict['tasks'] = list()
                     if not has_flag:
                         node_list.append(node_dict)           
-            else:
+            else:   # 之前分配过last_node
                 if last_node != None:
                     avail_gpu_list = last_node.get_free_gpus(job['priority'])
                     if len(avail_gpu_list)>last_node_gpu:
@@ -447,7 +447,7 @@ class _Switch(object):
 
         # print("try_single_node_alloc: ", need_gpu, need_cpu, JOBS.worker_mem)
         max_node_id = -1
-        max_node_gpu = 0
+        max_node_gpu = 0            # 记录一个node最多能提供多少个gpu
         if need_gpu == job['num_gpu']: # no gpu is allocated for job
             for node in self.node_list:
                 # print(node.id, node.check_free_gpus(), node.check_free_cpus(), node.free_mem)
@@ -455,20 +455,20 @@ class _Switch(object):
                 avail_gpu_cnt = len(avail_gpu_list)
                 if (avail_gpu_cnt>=need_gpu) and (node.check_free_cpus() >= need_cpu) and (node.free_mem >= JOBS.worker_mem):
                     # if node.alloc_gpus(need_gpu) == False:
-                    assert node.alloc_job_res(need_gpu, need_cpu, job['priority'], avail_gpu_list[:need_gpu], job['job_idx'], gpu_util=job['gpu_util']-0.01) == True
+                    assert node.alloc_job_res(need_gpu, need_cpu, job['priority'], avail_gpu_list[:need_gpu], job['job_idx'], gpu_util=job['gpu_util']-0.01) == True    # 为什么要减0.01
                     node.free_mem = node.free_mem - JOBS.worker_mem
                     traffic = JOBS.create_single_node_placement(job, self.id, node.id, need_gpu, need_cpu, JOBS.worker_mem, avail_gpu_list[:need_gpu])
                     # node.add_network_load(traffic, traffic)
                     job['remaining_gpu'] -= need_gpu
                     job['last_node_id'] = node.id
-                    self.add_job_gpu_util(job)
+                    self.add_job_gpu_util(job)      # job的各个gpu的利用率增加0.01
                     return True
                 else:
                     if avail_gpu_cnt>max_node_gpu:
                         max_node_gpu = avail_gpu_cnt
                         max_node_id = node.id
                         max_node_gpu_list = copy.deepcopy(avail_gpu_list)
-            # not enough gpu, reserve available
+            # not enough gpu, reserve available（预定可获得最多gpu的那个node）
             need_gpu = max_node_gpu
             if need_gpu>0:
                 if len(job['ps_network']) == 0 and job['num_gpu'] == 1:
@@ -496,7 +496,7 @@ class _Switch(object):
                 # node.add_network_load(traffic, traffic)
                 self.add_job_gpu_util(job)
                 return True
-            else: # not enough gpu
+            else: # not enough gpu  （一点点蚕食？）
                 need_gpu = avail_gpu_cnt
                 if need_gpu>0:
                     need_cpu = int(need_gpu * 6) # worker:2, ps:4
@@ -534,6 +534,8 @@ class _Switch(object):
 
         for opportunistic job:
         if no enough gpus, give up, return False (all-or-nothing)
+
+        一定会有placement
         '''
         need_gpu = job['num_gpu']
         if job['priority']==0: # resource-guarantee job
@@ -542,28 +544,28 @@ class _Switch(object):
             else:
                 ret = self.try_single_node_alloc_antman(job)
         else:
-            gpus1 = self.find_gpu_util(gpu_util_upper)
+            gpus1 = self.find_gpu_util(gpu_util_upper)      # 利用率低于gpu_util_upper的所有gpu，每个元素为{'node':self.id, 'gpu':i}
             if len(gpus1)<need_gpu:
                 return False
-            gpus2 = self.min_load_nodes(gpus1, need_gpu)
+            gpus2 = self.min_load_nodes(gpus1, need_gpu)    # 先对gpu按照利用率进行排序，然后返回前need_gpu个
             # print(job['job_idx'], "low priority")
             # print(gpus1)
             # print(gpus2)
-            tmp_node_dict = dict()
+            tmp_node_dict = dict()  # 记录每个节点使用到的gpu
             for gpu_id, gpu2 in enumerate(gpus2):
                 self.node_list[gpu2['node']].gpu_util_list[gpu2['gpu']] += job['gpu_util']
-                self.node_list[gpu2['node']].gpu_job_list[gpu2['gpu']][1].append(job['job_idx'])
+                self.node_list[gpu2['node']].gpu_job_list[gpu2['gpu']][1].append(job['job_idx'])        # 为什么把这里的job分到priority=1的类型（0对应的是独占）
                 if gpu2['node'] not in tmp_node_dict:
                     tmp_node_dict[gpu2['node']]=list()
                 tmp_node_dict[gpu2['node']].append(gpu2['gpu'])
             node_key_list = tmp_node_dict.keys()
-            for node_key in node_key_list:
+            for node_key in node_key_list:                  # 获取各个节点分配的资源
                 need_gpu = len(tmp_node_dict[node_key])
                 if len(job['ps_network']) == 0 and job['num_gpu'] == 1:
                     need_cpu = int(need_gpu * 2) # worker:2
                 else:
                     need_cpu = int(need_gpu * 6) # worker:2, ps:4
-                JOBS.create_single_node_placement(job, self.id, node_key, need_gpu, need_cpu, JOBS.worker_mem, tmp_node_dict[node_key])
+                JOBS.create_single_node_placement(job, self.id, node_key, need_gpu, need_cpu, JOBS.worker_mem, tmp_node_dict[node_key]) # 不考虑network？
                 self.node_list[node_key].free_mem -= JOBS.worker_mem
             job['remaining_gpu'] = 0
             ret = True

@@ -34,7 +34,7 @@ class Worker(object):
         self._client_for_master = worker_client.WorkerClientForMaster(self._logger, self._master_ip, self._master_port)
 
         self._server_for_master = self.make_server_for_master(self._worker_port)
-        
+        # time.sleep(60)
         self._tasks = dict()
 
         self.register()
@@ -136,27 +136,31 @@ class Worker(object):
         # prepare
         device_list = range(self._num_gpus)
         process_list = []
-        os.system("rm -rf profiling*.xml")
-        os.system("rm -rf profiling*.out")
+        os.system("rm -rf ../../tmp/profiling*.xml")
+        os.system("rm -rf ../../tmp/profiling*.out")
 
         # start subprocess
         # gpu
         for device in device_list:
-            filename = "profiling" + str(device) + ".xml"
+            filename = "../../tmp/profiling_" + str(self._worker_id) + "_" +str(device) + ".xml"
             command = "exec nvidia-smi -q -i " + str(device) + " -x -l 1 -f " + filename
             process_list.append(subprocess.Popen(command, shell=True))
         # cpu
-        cpu_command = "exec top -d 1 -bn " + str(secs) + " | grep Cpu > profiling_cpu.out"
+        cpu_command = "exec top -d 1 -bn " + str(secs) + " | grep Cpu > ../../tmp/profiling_" + str(self._worker_id) + "_cpu.out"
         cpu_process = subprocess.Popen(cpu_command, shell=True)
         # io
-        io_command = "exec iostat -d 1 " + str(secs) + " | grep nvme > profiling_disk.out"
+        io_command = "exec iostat -d 1 " + str(secs) + " | grep nvme > ../../tmp/profiling_" + str(self._worker_id) + "_disk.out"
         io_process = subprocess.Popen(io_command, shell=True)
 
         # wait
+        print("wait")
+        count = 0
         time.sleep(secs)
         for process in process_list:
             process.send_signal(signal.SIGINT)
             process.terminate()
+            print("wait", count)
+            count += 1
             process.wait()
         cpu_process.wait()
         io_process.wait()
@@ -165,12 +169,12 @@ class Worker(object):
         useful_ratio = 0
         gpu_utils = []
         for device in device_list:
-            filename = "profiling" + str(device) + ".xml"
+            filename = "../../tmp/profiling_" + str(self._worker_id) + "_" +str(device) + ".xml"
             memory_usage, utilization = utils.parse_xml(filename)
             for i in range(len(memory_usage)):
                 memory_usage[i] = int(memory_usage[i].split(' ')[0])
                 utilization[i] = int(utilization[i].split(' ')[0])
-            self._logger.info(f'{memory_usage}, {utilization}')
+            # self._logger.info(f'{memory_usage}, {utilization}')
             sorted_memory_usages = sorted(memory_usage)
             gpu_util_device = 0
             gpu_util_cnt = 0
@@ -186,7 +190,7 @@ class Worker(object):
 
         
         cpu_util_list = []
-        util_str_list = open("profiling_cpu.out", "r").read().split('\n')
+        util_str_list = open("../../tmp/profiling_" + str(self._worker_id) + "_cpu.out", "r").read().split('\n')
         for i in range(secs):
             idle = float(util_str_list[i].split()[7])
             cpu_util_list.append(round(100.0 -idle, 3))
@@ -194,7 +198,7 @@ class Worker(object):
         self._logger.info(f'cpu util: {cpu_util_list}, {cpu_util}')
         
         io_util_list = []
-        util_str_list = open("profiling_disk.out", "r").read().split('\n')
+        util_str_list = open("../../tmp/profiling_" + str(self._worker_id) + "_disk.out", "r").read().split('\n')
         for i in range(secs):
             kB_read = float(util_str_list[i].split()[2])
             io_util_list.append(kB_read)

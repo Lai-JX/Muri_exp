@@ -336,22 +336,27 @@ if __name__ == '__main__':
     if sargs0['iters']!=0:
         # print(1)
         model0 = get_model(0, args, sargs0)
+        tt = time.time()
         model0.prepare(hvd)
+        print(f'{sargs0["model_name"]} load time: {time.time()-tt}')
         num_job += 1
     # time1 = time.time()
     if sargs1['iters']!=0:
         model1 = get_model(1, args, sargs1)
         model1.prepare(hvd)
+        print(f'{sargs1["model_name"]} load time: {time.time()-tt}')
         num_job += 1
     # time2 = time.time()
     if sargs2['iters']!=0:
         model2 = get_model(2, args, sargs2)
         model2.prepare(hvd)
+        print(f'{sargs2["model_name"]} load time: {time.time()-tt}')
         num_job += 1
     # time3 = time.time()
     if sargs3['iters']!=0:
         model3 = get_model(3, args, sargs3)
         model3.prepare(hvd)
+        print(f'{sargs3["model_name"]} load time: {time.time()-tt}')
         num_job += 1
     # time4 = time.time()
     # print(time1-time0, time2-time1, time3-time2, time4-time3)

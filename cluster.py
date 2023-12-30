@@ -466,11 +466,11 @@ class _Cluster(object):
         w_switch_list = list()
 
         for w in range(0, num_w):
-            start_ngid = random.randint(0, self.num_node - 1) 
+            start_ngid = random.randint(0, self.num_node - 1)   # 随机从节点start_ngid开始遍历
             allocated = False
             for i in range(self.num_node):
                 n_gid = int(int(start_ngid + i) % self.num_node)
-                tmp_infra = self.get_node_with_gid(n_gid)
+                tmp_infra = self.get_node_with_gid(n_gid)       # 获取n_gid对于的swith和node
                 node = tmp_infra['node']
                 switch = tmp_infra['switch']
                 switch_idx = switch.id
@@ -507,7 +507,7 @@ class _Cluster(object):
                     node.alloc_cpus(4)
                     allocated = True
                     break
-            if allocated == False:
+            if allocated == False:          # 失败则释放所有已分配的资源
                 for n in w_node_list:
                     n.release_job_gpu_cpu(1, 2)
                 for n in ps_node_list:
@@ -546,20 +546,20 @@ class _Cluster(object):
             s_id = w_switch_list[i]
             node = w_node_list[i]
 
-            #check colocate info, and deduct co-locate worker-to-PS traffic
+            #check colocate info, and deduct co-locate worker-to-PS traffic 检查共置信息，并扣除共置 worker 到 PS 的流量
             colocate_info = utils.search_dict_list(node_list, 'node', node)
             de_traffic = 0
             if colocate_info != None:
                 for j in colocate_info['ps']:
                     de_traffic += job['ps_network'][j]
-                    de_traffic = round(de_traffic, 1)
+                    de_traffic = round(de_traffic, 1)       # 同一节点的流量
 
             tmp_dict = dict()
             node_dict = dict()
             node_dict['id'] = node.id
             node_dict['num_gpu'] = 1
             node_dict['num_cpu'] = 2
-            node_dict['network'] = round(job['w_network'][i] - de_traffic, 1)
+            node_dict['network'] = round(job['w_network'][i] - de_traffic, 1)   # 减去同一节点的流量
             node.add_network_load(node_dict['network'], node_dict['network'])
 
             node_dict['tasks'] = list()
@@ -629,8 +629,8 @@ class _Cluster(object):
         # print(num_gpu_list)
 
         # go through workers
-        w_node_list = list()        # 每个gpu对于的node
-        w_switch_list = list()      # 每个gpu对于的switch编号
+        w_node_list = list()        # 每个gpu对应的node
+        w_switch_list = list()      # 每个gpu对应的switch编号
         p_done = True 
         for i in range(0, num_node):        # 一个节点一个节点分配
             switch_idx = random.randint(0, self.num_switch - 1)

@@ -26,7 +26,7 @@ class _Node(object):
         self.job_gpu = 0
         self.num_jobs = 0
         self.gpu_job_list = [{0:[], 1:[]} for i in range(self.num_gpu)]
-        self.gpu_util_list = [0.0 for i in range(self.num_gpu)]
+        self.gpu_util_list = [0.0 for i in range(self.num_gpu)]         # 各个GPU的利用率
 
         utils.print_fn('    Node[%d] has %d gpus, %d cpus, %d G memory' % (id, num_gpu, num_cpu, mem))
     

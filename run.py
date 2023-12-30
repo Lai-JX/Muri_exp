@@ -260,6 +260,7 @@ def mps_sim_jobs(scheduler=None, gputime=False, place=False):
                 else:
                     e_job['status'] = 'PENDING'
                     scheduler._trainers.pop(e_job['job_idx'])
+                    CLUSTER.release_job_res(e_job)      # ljx 出错的job也应释放资源
                     del e_job['placements'][:]
                 done_flag = True
                 print(scheduler.get_time(), 'check: done ', e_job['job_idx'], finished_time)
@@ -332,8 +333,10 @@ def mps_sim_jobs(scheduler=None, gputime=False, place=False):
                             # if gputime:
                             #     rjob['remaining_gputime'] = rjob['remaining_time'] * rjob['num_gpu']
                             # scheduler._logger.info(f'{tmp_time} check: running  {rjob["job_idx"]} {rjob["remaining_iterations"]} {rjob["total_executed_time"]}')  
-                            # kill           
-                            scheduler.save_model([rjob['job_idx']])          
+                            # kill        
+                            time_save_begin = time.time()   
+                            scheduler.save_model([rjob['job_idx']])      
+                            scheduler._logger.info(f'scheduler, {rjob["model_name"]}, model save time: {time.time()-time_save_begin}')  
                             # time.sleep(rjob['iteration_time']*1.2)               
                             if rjob['job_idx'] in scheduler._trainers:
                                 scheduler._trainers.pop(rjob['job_idx'])

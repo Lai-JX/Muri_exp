@@ -59,9 +59,9 @@ class Controller(object):
 
     def get_util(self, secs=20):
         num_workers = len(self._workers)
-        self._logger.info(f'controller get util of {num_workers} worker(s): {secs}s')
         avg_gpu_util_all, avg_cpu_util_all, avg_io_read_all = 0, 0, 0
         for worker in self._workers:
+            self._logger.info(f'controller get util of {num_workers} worker(s) of {worker._worker_id}: {secs}s')
             avg_gpu_util, avg_cpu_util, avg_io_read = worker.get_util(secs)
             avg_gpu_util_all += avg_gpu_util
             avg_cpu_util_all += avg_cpu_util
