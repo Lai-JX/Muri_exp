@@ -86,11 +86,14 @@ class Trainer(object):
 
         return server_thread
 
-
-    def _query_stats_impl(self):
+    def _cal_report_iteration(self):
         tmp = self._finished_iteraions
         report_iteraions = tmp - self._reported_iteraions       # 两次查询的间隔执行了多少次迭代
         self._reported_iteraions = tmp
+        return report_iteraions
+
+    def _query_stats_impl(self):
+        report_iteraions = self._cal_report_iteration()
         self._logger.info(f'trainer query stats, {report_iteraions}')
         return report_iteraions, self._iteration_time
     
