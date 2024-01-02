@@ -24,10 +24,10 @@ bash $THIS_DIR/prepare_env.sh $SCHEDULER_IP $WORKER_PORT $TRAINER_PORT $WORKER_I
 service ssh restart     # 防止系统抽风
 
 # set the scheduling policy and related parameters
-placement=('yarn')
+placement=('mps' 'mps3')
 export schedules_all=$1
 shift
-jobs=('cluster_trace_1')
+jobs=('cluster_trace_12_long')
 setups=("n1g2")
 packing_nums=("4")
 schedule_intervals=("60")          # 6分钟（和论文中一致）ljx:这里先改为10s

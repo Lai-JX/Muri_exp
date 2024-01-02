@@ -365,7 +365,7 @@ def mps_sim_jobs(scheduler=None, gputime=False, place=False):
             # time.sleep(FLAGS.schedule_interval-(time01-time00))       # 取消特定周期调度
 
 
-def mps_antman_jobs(scheduler=None, gputime=False, place=False):
+def merge_antman_jobs(scheduler=None, gputime=False, place=False):
 
     # end_events = list()
     scheduler._controller.set_start_time()
@@ -453,7 +453,10 @@ def mps_antman_jobs(scheduler=None, gputime=False, place=False):
                         scheduler._logger.info(f'scheduler, {rjob["job_idx"]}, still running. remaining_iterations:{rjob["remaining_iterations"]} ')
                         continue
                     rjob['priority'] = 1        # ljx 多个job在一起
-                    rjob['gpu_util'] = 0.4      # ljx 
+                    if FLAGS.scheme == 'mps3': 
+                        rjob['gpu_util'] = 0.4      # ljx 
+                    else:
+                        rjob['gpu_util'] = 0.5
                     scheduler._logger.info(f'try_get_job_res, {rjob["job_idx"]}')
                     ret = try_get_job_res(rjob)                                         # ② 新运行
                     if not ret:                                                         # 资源不够
@@ -514,7 +517,8 @@ def mps_antman_jobs(scheduler=None, gputime=False, place=False):
             time01 = time.time()
             print(f'at end: {scheduler.get_time()}\n\n', 'checkpoint and save model time', time01-time00, "\n\n")
             count = 0
-            while count < 120 and scheduler._controller.done_queue.empty():
+            interval = 120 if FLAGS.scheme == 'mps3' else 60
+            while count < interval and scheduler._controller.done_queue.empty():
                 time.sleep(1)
                 count += 1
                 # print("sleep", count)

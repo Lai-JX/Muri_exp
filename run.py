@@ -1746,14 +1746,10 @@ def main():
         multi_resource_blossom_same_sim_jobs(scheduler, True, know_duration=False, blossom=False)
     elif FLAGS.schedule == 'themis':
         themis_sim_jobs(scheduler, )
-    elif FLAGS.schedule == 'mps':                                                           # mps
-        mps_sim_jobs(scheduler)
-    elif FLAGS.schedule == 'mps-gpu':                                                       # mps
-        mps_sim_jobs(scheduler, True)
-    elif FLAGS.schedule == 'nps':                                                           # nps 
+    elif FLAGS.schedule == 'nps':                                                           # nps  (shortestf first)
         nps_sim_jobs(scheduler)
-    elif FLAGS.schedule == 'mps_antman':                                                           # mps_antman
-        mps_antman_jobs(scheduler)
+    elif FLAGS.schedule == 'merge-antman':                                                           # mps_antman
+        merge_antman_jobs(scheduler)
     else:
         print('not support scheduler') 
 
