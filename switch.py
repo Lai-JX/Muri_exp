@@ -527,7 +527,7 @@ class _Switch(object):
         return gpus1[:need_gpu]
 
 
-    def antman_alloc_res(self, job, gpu_util_upper=0.8):
+    def antman_alloc_res(self, job, gpu_util_upper=0.5):            # ljx 0.8→0.5
         '''
         antman allocates res from a single switch
         for resource-guarantee job:

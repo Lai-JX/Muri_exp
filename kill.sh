@@ -16,4 +16,5 @@ if [ $1 ]; then
     kill_all $1
 else
     kill_all "python"
+    kill_all "nvidia-smi"
 fi

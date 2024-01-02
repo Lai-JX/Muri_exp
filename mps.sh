@@ -6,7 +6,7 @@ while getopts "sqh" arg #选项后面的冒号表示该选项需要参数
 do
         case $arg in
              s)
-                sudo nvidia-smi -c EXCLUSIVE_PROCESS
+               #  sudo nvidia-smi -c EXCLUSIVE_PROCESS
                 sudo nvidia-cuda-mps-control -d
                 ;;
              h)

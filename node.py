@@ -177,8 +177,9 @@ class _Node(object):
 
     def find_gpu_util(self, gpu_util_upper):
         gpu_list = []
+        print(self.gpu_util_list, gpu_util_upper)
         for i in range(self.num_gpu):
-            if self.gpu_util_list[i]<gpu_util_upper:
+            if self.gpu_util_list[i]<gpu_util_upper:       # ljx < → <=
                 gpu_list.append({'node':self.id, 'gpu':i})
                 # print(self.id, i, self.gpu_util_list[i])
         return gpu_list

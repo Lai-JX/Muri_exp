@@ -24,7 +24,8 @@
 # #     def forward(self, x):
 # #         x = self.model_customize(x)
 # #         return x
-import xml.etree.ElementTree as ET     
+import xml.etree.ElementTree as ET    
+import threading 
         
 # # if __name__ == '__main__':
 # #     net = Net()
@@ -122,3 +123,31 @@ if __name__ == '__main__':
     log_path = '/home/jxlai/nfs-share/Muri_exp/results/n2g2jcluster_trace_12p4si60ff0/mps-yarn-4'
     s = log_path.replace("results", "model")
     print(s)
+
+
+    def get_util(secs=20):
+        workers = [0,1]
+        num_workers = len(workers)
+        avg_gpu_util_all, avg_cpu_util_all, avg_io_read_all = 0, 0, 0
+
+        def worker_get_util(worker):
+            nonlocal avg_gpu_util_all, avg_cpu_util_all, avg_io_read_all
+            # avg_gpu_util, avg_cpu_util, avg_io_read = worker.get_util(secs)
+            avg_gpu_util_all += 1#avg_gpu_util
+            avg_cpu_util_all += 1#avg_cpu_util
+            avg_io_read_all += 1#avg_io_read
+        threads = []
+        for worker in workers:
+            print(f'controller get util of {num_workers} worker(s) of {worker}: {secs}s')
+            thread = threading.Thread(target=worker_get_util, args=(worker,))
+            threads.append(thread)
+            thread.start()
+        for thread in threads:
+            thread.join()
+            
+            
+        avg_gpu_util_all /= num_workers
+        avg_cpu_util_all /= num_workers
+        avg_io_read_all /= num_workers
+        return avg_gpu_util_all, avg_cpu_util_all, avg_io_read_all
+    print(get_util())

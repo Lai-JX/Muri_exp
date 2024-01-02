@@ -21,7 +21,7 @@ class Scheduler(object):
 
         self._num_workers = CLUSTER.num_node_p_switch                               # worker=node
         self._controller = Controller(controller_port, self._num_workers)           # Controller._server_for_worker 运行master_server.serve, 会等待所有的worker都准备好了
-        self._src_num = 3
+        self._src_num = 4           # ljx
         self._src_utils = [0 for _ in range(self._src_num)]
 
         # self._start_time = self._controller.get_time()

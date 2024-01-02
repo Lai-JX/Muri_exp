@@ -38,6 +38,7 @@ class WorkerClientForMaster(object):
             return False, None
     
     def done(self, job_id, job_counter, worker_id, gpus, returncode):
+        self._logger.info(f'{worker_id}, done before, {job_id} - {job_counter}, {gpus}, return code: {returncode}')
         request = DoneRequest(job_id=job_id, job_counter=job_counter, worker_id=worker_id, gpus=gpus, returncode = returncode)
         response = self._stub.Done(request)
 

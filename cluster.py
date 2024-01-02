@@ -443,7 +443,7 @@ class _Cluster(object):
 
     def antman_placement(self, job):
         for switch in self.switch_list:
-            ret = switch.antman_alloc_res(job)
+            ret = switch.antman_alloc_res(job, gpu_util_upper=1.0)    # ljx  gpu_util_upper=1.0
             if ret == True:
                 return True
             else:

@@ -68,8 +68,14 @@ mpsG1:
 	rm ./workloads/*.txt; rm ./workloads/*.out; rm ./workloads/*.xml; rm ./workloads/hostfiles/hostfile-*; ./kill.sh; ./run.sh 192.168.1.104 9001 9013 2 mps-gpu
 
 
-# mps
+# nps 其实就是规整后的mps
 nps:
-	rm ./workloads/*.txt; rm ./workloads/*.out; rm ./workloads/*.xml; rm ./workloads/hostfiles/hostfile-*; rm ../../tmp/job/*.out; rm ../../tmp/job/*.xml; rm ./*.out; rm ./*.xml; ./kill.sh; ./run.sh 192.168.1.104 9002 9013 1 nps
+	rm ./workloads/*.txt; rm ./workloads/*.out; rm ./workloads/*.xml; rm ./workloads/hostfiles/hostfile-*; rm ../../tmp/job/*.out; rm ../../tmp/job/*.xml; rm ./*.out; rm ./*.xml; ./kill.sh; ./run.sh 192.168.1.107 9002 9013 1 nps
 nps1:
 	./kill.sh; ./run.sh 192.168.1.104 9002 9013 2 nps
+
+# mps
+mpsa:
+	rm ./workloads/*.txt; rm ./workloads/*.out; rm ./workloads/*.xml; rm ./workloads/hostfiles/hostfile-*; rm ../../tmp/job/*.out; rm ../../tmp/job/*.xml; rm ./*.out; rm ./*.xml; ./kill.sh; ./run.sh 192.168.1.107 9002 9013 1 mps_antman
+mpsa1:
+	./kill.sh; ./run.sh 192.168.1.104 9002 9013 2 mps_antman

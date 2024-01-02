@@ -60,12 +60,23 @@ class Controller(object):
     def get_util(self, secs=20):
         num_workers = len(self._workers)
         avg_gpu_util_all, avg_cpu_util_all, avg_io_read_all = 0, 0, 0
-        for worker in self._workers:
-            self._logger.info(f'controller get util of {num_workers} worker(s) of {worker._worker_id}: {secs}s')
+        def worker_get_util(worker):
+            nonlocal avg_gpu_util_all, avg_cpu_util_all, avg_io_read_all
             avg_gpu_util, avg_cpu_util, avg_io_read = worker.get_util(secs)
             avg_gpu_util_all += avg_gpu_util
             avg_cpu_util_all += avg_cpu_util
             avg_io_read_all += avg_io_read
+            
+        threads = []
+        for worker in self._workers:
+            self._logger.info(f'controller get util of {num_workers} worker(s) of {worker._worker_id}: {secs}s')
+            print(f'controller get util of {num_workers} worker(s) of {worker}: {secs}s')
+            thread = threading.Thread(target=worker_get_util, args=(worker,))
+            threads.append(thread)
+            thread.start()
+        for thread in threads:
+            thread.join()
+        
         avg_gpu_util_all /= num_workers
         avg_cpu_util_all /= num_workers
         avg_io_read_all /= num_workers

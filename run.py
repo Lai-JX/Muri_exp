@@ -124,7 +124,7 @@ def parse_job_file(trace_file):
     job_idx = 0
     for row in reader: 
         #add job into JOBS,  JOBS = _TFJobs()
-        if int(row['num_gpu']) <= 4:     # ljx (row['model_name'] != 'bert' and row['model_name'] != 'gpt2') and 
+        if int(row['num_gpu']) <= 2:     # ljx (row['model_name'] != 'bert' and row['model_name'] != 'gpt2') and 
             JOBS.add_job(row)
             job_idx += 1
         # if job_idx == 20:   # ljx:先只采用20个job
@@ -1748,10 +1748,12 @@ def main():
         themis_sim_jobs(scheduler, )
     elif FLAGS.schedule == 'mps':                                                           # mps
         mps_sim_jobs(scheduler)
-    elif FLAGS.schedule == 'mps-gpu':                                                           # mps
+    elif FLAGS.schedule == 'mps-gpu':                                                       # mps
         mps_sim_jobs(scheduler, True)
-    elif FLAGS.schedule == 'nps':                                                           # nps
+    elif FLAGS.schedule == 'nps':                                                           # nps 
         nps_sim_jobs(scheduler)
+    elif FLAGS.schedule == 'mps_antman':                                                           # mps_antman
+        mps_antman_jobs(scheduler)
     else:
         print('not support scheduler') 
 

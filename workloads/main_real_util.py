@@ -304,7 +304,7 @@ def train():
             print("gpu: ", memory_usage, utilization, gpu_util)
         print("cpu: ", cpu_util_list, cpu_util)
         print("io: ", io_read, 'kb/s')
-        trainer.report_itertime(itertime_list, [gpu_util, cpu_util, io_read])
+        trainer.report_itertime(itertime_list, [gpu_util, sorted_memory_usages[-2], cpu_util, io_read])
 
 
 if __name__ == '__main__':
