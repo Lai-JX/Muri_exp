@@ -138,7 +138,7 @@ class Worker(object):
         process_list = []
         os.system("rm -rf ../../tmp/profiling*.xml")
         os.system("rm -rf ../../tmp/profiling*.out")
-
+        self._logger.info(f'current path: {os.getcwd()}')
         # start subprocess
         # gpu
         for device in device_list:
@@ -153,13 +153,11 @@ class Worker(object):
         io_process = subprocess.Popen(io_command, shell=True)
 
         # wait
-        print("wait")
         count = 0
         time.sleep(secs)
         for process in process_list:
             process.send_signal(signal.SIGINT)
             process.terminate()
-            print("wait", count)
             count += 1
             process.wait()
         cpu_process.wait()
@@ -178,7 +176,7 @@ class Worker(object):
             sorted_memory_usages = sorted(memory_usage)
             gpu_util_device = 0
             gpu_util_cnt = 0
-            print(memory_usage, sorted_memory_usages)
+            # print(memory_usage, sorted_memory_usages)
             for i in range(len(memory_usage)):
                 if math.isclose(memory_usage[i], sorted_memory_usages[-2], rel_tol=1e-1):
                     gpu_util_device += utilization[i]

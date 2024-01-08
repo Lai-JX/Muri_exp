@@ -296,6 +296,7 @@ class NLPModel:
         return self.sargs['batch_size']*per_data_size
     
     def save(self, filename):
+        print('save nlp model, ', filename)
         with open('%s.model' % (filename),'wb') as f:
             torch.save(self.model.state_dict(), f)
 

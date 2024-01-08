@@ -58,9 +58,9 @@ themis1:
 
 # nps 其实就是规整后的mps
 nps:
-	rm ./workloads/*.txt; rm ./workloads/*.out; rm ./workloads/*.xml; rm ./workloads/hostfiles/hostfile-*; rm ../../tmp/job/*.out; rm ../../tmp/job/*.xml; rm ./*.out; rm ./*.xml; ./kill.sh; ./run.sh 192.168.1.107 9002 9013 1 nps
+	rm ./workloads/*.txt; rm ./workloads/*.out; rm ./workloads/*.xml; rm ./workloads/hostfiles/hostfile-*; rm ../../tmp/job/*.out; rm ../../tmp/job/*.xml; rm ./*.out; rm ./*.xml; ./kill.sh; ./run.sh 192.168.1.107 9002 9013 1 nps,merge-antman
 nps1:
-	./kill.sh; ./run.sh 192.168.1.104 9002 9013 2 nps
+	./kill.sh; ./run.sh 192.168.1.104 9002 9013 2 nps,merge-antman
 
 # merge 2
 merge:

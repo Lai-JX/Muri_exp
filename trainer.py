@@ -98,6 +98,7 @@ class Trainer(object):
         return report_iteraions, self._iteration_time
     
     def _save_model_impl(self):
+        print("\n\n\n\n\n model save, ", self._iteration_time)
         self._save_flag = True
         self._save_finished = False
         self._logger.info(f'trainer model save, {self._iteration_time}')

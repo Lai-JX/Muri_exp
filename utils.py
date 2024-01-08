@@ -83,7 +83,7 @@ def search_dict_list(dict_list, key, value):
     return None
 
 def parse_xml(filename:str):
-    print('parse_xml:',filename)
+    # print('parse_xml:',filename)
     fb_memory_usage = []
     utilization = []
     file_content = open(filename, mode='r').read()

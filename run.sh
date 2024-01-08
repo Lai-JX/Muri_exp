@@ -23,18 +23,27 @@ bash $THIS_DIR/prepare_env.sh $SCHEDULER_IP $WORKER_PORT $TRAINER_PORT $WORKER_I
 
 service ssh restart     # 防止系统抽风
 
-# set the scheduling policy and related parameters
-placement=('mps' 'mps3')
-export schedules_all=$1
+
+export schedules_all=$@         # ljx
 shift
-jobs=('cluster_trace_12_long')
+jobs=('cluster_trace_13_1')
 setups=("n1g2")
 packing_nums=("4")
 schedule_intervals=("60")          # 6分钟（和论文中一致）ljx:这里先改为10s
 fast_forwards=("0")
 
 IFS=','
-read -ra schedule <<<"$schedules_all"
+read -ra schedule <<< "$schedules_all"
+
+# set the scheduling policy and related parameters
+if [ ${schedule[0]} == 'nps' ]; then
+    placement=('yarn')
+else
+    placement=('mps' 'mps3')
+fi
+# placement=('mps' 'mps3')
+echo ${schedule[0]}
+echo ${placement[@]}
 
 mkdir $THIS_DIR/results
 for setup in ${setups[@]};do                                                                            # 集群配置

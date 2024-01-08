@@ -418,10 +418,12 @@ def merge_antman_jobs(scheduler=None, gputime=False, place=False):
                         tmp = tmp_time - rjob['last_check_time']
                         rjob['total_executed_time'] = rjob['total_executed_time'] + tmp
                         rjob['last_check_time'] = tmp_time
-                        try:
-                            finished_iter, iteration_time = scheduler.query_stats([rjob['job_idx']])    # 同时更新迭代时间
-                        except grpc._channel._InactiveRpcError:
+                        try:                                                                                    # 用try，因为job可能在之前done检查之后完成了，此时连接断开，无法查询到job状态
+                            finished_iter, iteration_time = scheduler.query_stats([rjob['job_idx']])            # 同时更新迭代时间
+                            scheduler._logger.info(f'try, {finished_iter}, {iteration_time}')  
+                        except:
                             finished_iter, iteration_time = rjob['remaining_iterations'], rjob['iteration_time']
+                            scheduler._logger.info(f'except, {finished_iter}, {iteration_time}')  
                         rjob['remaining_iterations'] -= finished_iter
                         rjob['iteration_time'] = iteration_time
                         # print(rjob['job_idx'], rjob['remaining_iterations'], finished_iter)
@@ -429,6 +431,15 @@ def merge_antman_jobs(scheduler=None, gputime=False, place=False):
                         if gputime:
                             rjob['remaining_gputime'] = rjob['remaining_time'] * rjob['num_gpu']
                         scheduler._logger.info(f'{tmp_time} check: running  {rjob["job_idx"]} {rjob["remaining_iterations"]} {rjob["total_executed_time"]}')  
+
+                        # test
+                        # time_save_begin = time.time()   
+                        # assert scheduler.save_model([rjob['job_idx']])                   # 如果模型保存不成功会影响后续job重新运行
+                        # scheduler._logger.info(f'scheduler, {rjob["model_name"]}, model save time: {time.time()-time_save_begin}') 
+
+
+
+
                     elif 'PENDING' == rjob['status']:
                         tmp = tmp_time - rjob['last_check_time']
                         rjob['pending_time'] += tmp
@@ -463,7 +474,7 @@ def merge_antman_jobs(scheduler=None, gputime=False, place=False):
                         for rev_idx in range(1, len(JOBS.runnable_jobs) - idx):         # ③ 寻找要抢占的job   
                             potential_job_to_preempt = JOBS.runnable_jobs[-rev_idx]
                             if potential_job_to_preempt['status'] == 'RUNNING':
-                                scheduler._logger.info(f'release_job_res, {rjob["job_idx"]}')
+                                scheduler._logger.info(f'release_job_res, {potential_job_to_preempt["job_idx"]}')
                                 CLUSTER.release_job_res(potential_job_to_preempt)   # 释放资源
                                 preempt_jobs.append(potential_job_to_preempt)       # 抢占，将被抢占的job置为pending
 
@@ -478,7 +489,7 @@ def merge_antman_jobs(scheduler=None, gputime=False, place=False):
                 # 要抢占的job
                 for job in preempt_jobs:
                     time_save_begin = time.time()   
-                    scheduler.save_model([job['job_idx']])      
+                    assert scheduler.save_model([job['job_idx']])                   # 如果模型保存不成功会影响后续job重新运行
                     scheduler._logger.info(f'scheduler, {job["model_name"]}, model save time: {time.time()-time_save_begin}') 
 
                     if job['job_idx'] in scheduler._trainers:

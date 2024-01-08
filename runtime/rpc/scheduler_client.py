@@ -37,5 +37,5 @@ class SchedulerClientForTrainer(object):
         self._logger.info(f'scheduler, save model, job {self._job_id}')
         request = SaveModelRequest()
         response = self._stub.SaveModel(request)
-        
+        self._logger.info(f'scheduler, save model, respone {response.success}')
         return response.success

@@ -26,6 +26,7 @@
 # #         return x
 import xml.etree.ElementTree as ET    
 import threading 
+import time
         
 # # if __name__ == '__main__':
 # #     net = Net()
@@ -132,6 +133,12 @@ if __name__ == '__main__':
 
         def worker_get_util(worker):
             nonlocal avg_gpu_util_all, avg_cpu_util_all, avg_io_read_all
+            i = 1
+            while i <= 20:
+                print(i)
+                time.sleep(1)
+                i += 1
+                
             # avg_gpu_util, avg_cpu_util, avg_io_read = worker.get_util(secs)
             avg_gpu_util_all += 1#avg_gpu_util
             avg_cpu_util_all += 1#avg_cpu_util
